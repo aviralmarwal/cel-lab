@@ -168,6 +168,16 @@ PROJECTS = [
         ),
         "themes": ["municipal-finance-property-tax", "urban-growth-simulation"],
     },
+    {
+        "title": "Population Synthesis for Disaggregated Travel Demand Modelling",
+        "role": "",
+        "summary": (
+            "Generates synthetic populations of households and individuals for Indian cities — matching census "
+            "marginals and survey microdata — as the input to activity- and agent-based travel demand models that "
+            "work at the level of individual trips rather than zonal aggregates."
+        ),
+        "themes": ["commuting-built-environment-typologies"],
+    },
 ]
 
 # Work in progress, listed on the theme page. Keep to what you're happy to show publicly.
