@@ -116,7 +116,7 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .pi-body h3{font-size:28px}
 .pi-body .role{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
 .pi-body p{font-size:15px;max-width:70ch}
-.pi-links{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+.pi-links{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;align-items:center;margin-top:6px}
 @media(max-width:700px){.pi-card{grid-template-columns:1fr}.avatar{max-width:220px}}
 .grid.people{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .person{background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden}
@@ -534,7 +534,8 @@ def build_projects():
 def build_people():
     pi = PEOPLE["pi"]
     av = f'<img src="{pi["photo"]}" alt="{e(pi["name"])}">' if pi["photo"] else f'{avatar_bg(1)}<span class="ini">{pi["initials"]}</span>'
-    links = "".join(f'<a href="{l["url"]}" target="_blank" rel="noopener">{e(l["label"])} ↗</a>' for l in pi["links"])
+    links = "".join((f'<a class="btn" href="{l["url"]}" download>{e(l["label"])}</a>' if l["url"].lower().endswith(".pdf")
+                     else f'<a href="{l["url"]}" target="_blank" rel="noopener">{e(l["label"])} ↗</a>') for l in pi["links"])
     scholars = ""
     for i, s in enumerate(PEOPLE["scholars"]):
         sav = f'<img src="{s["photo"]}" alt="{e(s["name"])}">' if s["photo"] else f'{avatar_bg(10+i)}<span class="ini">{s["initials"]}</span>'

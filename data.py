@@ -218,7 +218,7 @@ PEOPLE = {
             "agent-based models and neural networks — and examines how land and tax policy shape urban growth. "
             "He holds a PhD in Land Economy from the University of Cambridge."
         ),
-        "links": [],  # e.g. {"label": "Google Scholar", "url": "..."}
+        "links": [{"label": "Download CV (PDF)", "url": "assets/people/Aviral-Marwal-CV.pdf"}],  # add e.g. {"label": "Google Scholar", "url": "..."}
         "photo": None,
     },
     "scholars": [
