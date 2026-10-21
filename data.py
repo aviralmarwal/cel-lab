@@ -6,7 +6,7 @@ LAB = {
     "dept": "Department of Humanities & Social Sciences",
     "inst": "IIT Roorkee",
     "address": "Department of Humanities & Social Sciences, Indian Institute of Technology Roorkee, Roorkee 247667, Uttarakhand, India",
-    "email": "",            # fill in
+    "email": "aviral.marwal@hs.iitr.ac.in",
     "domain": "cel-lab.in",
     "cname_live": False,    # set True after the domain's DNS points at GitHub Pages
     "description": (
