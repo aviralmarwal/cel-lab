@@ -170,12 +170,14 @@ PROJECTS = [
     },
     {
         "title": "Population Synthesis for Disaggregated Travel Demand Modelling",
-        "role": "",
+        "role": "Co-PI",
         "summary": (
-            "Generates synthetic populations of households and individuals for Indian cities — matching census "
-            "marginals and survey microdata — as the input to activity- and agent-based travel demand models that "
-            "work at the level of individual trips rather than zonal aggregates."
+            "Builds a synthetic population of households and individuals for Bengaluru — matched to census "
+            "marginals and survey microdata — as the foundation for disaggregated, activity-based travel demand "
+            "modelling. A second phase of the Aggregate-M3DM city-scale mobility demand project, carried out with "
+            "the Centre for infrastructure, Sustainable Transportation and Urban Planning (CiSTUP), IISc Bengaluru."
         ),
+        "partner": "CiSTUP, IISc Bengaluru",
         "themes": ["commuting-built-environment-typologies"],
     },
 ]

@@ -421,7 +421,9 @@ def pub_html(p, root="", compact=False):
 
 def project_html(pr, root=""):
     th = ", ".join(f'<a href="{root}research/{s}.html">{e(THEME_BY_SLUG[s]["title"])}</a>' for s in pr["themes"])
-    role = f'<div class="meta"><span class="tag role">{e(pr["role"])}</span></div>' if pr.get("role") else ""
+    tags = "".join(f'<span class="tag role">{e(pr["role"])}</span>' if pr.get("role") else "") + \
+           (f'<span class="tag">Partner: {e(pr["partner"])}</span>' if pr.get("partner") else "")
+    role = f'<div class="meta">{tags}</div>' if tags else ""
     return (f'<article class="proj">{role}'
             f'<h3>{e(pr["title"])}</h3><p>{e(pr["summary"])}</p><div class="themes muted">Theme: {th}</div></article>')
 
