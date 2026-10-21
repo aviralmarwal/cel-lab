@@ -636,7 +636,7 @@ def main():
     if os.path.isdir(src_assets):
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
     for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
-    w("CNAME", LAB["domain"] + "\n")
+    if LAB.get("cname_live"): w("CNAME", LAB["domain"] + "\n")  # only once DNS for the domain points at GitHub
     print("built", sum(len(f) for _, _, f in os.walk(OUT)), "files in", OUT)
 
 if __name__ == "__main__":
