@@ -1,0 +1,643 @@
+#!/usr/bin/env python3
+"""Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
+import os, shutil, html, math, random
+from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES
+
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
+THEME_BY_SLUG = {t["slug"]: t for t in THEMES}
+e = html.escape
+
+# ───────────────────────── CSS ─────────────────────────
+CSS = r"""
+/* Layout: quiet academic site. Cream page, navy ink, teal accent, amber used sparingly. */
+:root{
+  --cream:#f7f4ee; --paper:#ffffff; --mist:#e6e0d6; --line:#d9d2c6;
+  --ink:#16222e; --body:#3d4752; --muted:#737b84;
+  --navy:#1a3a5c; --teal:#0e7c7b; --teal-dk:#0a6261; --amber:#d9901a;
+  --lu-r:#a8c5da; --lu-c:#e8a020; --lu-g:#5a9e6f; --lu-w:#4a90c4; --lu-i:#9b8ea0; --lu-rd:#d4cfc8;
+  --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --sans:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'Space Mono','SFMono-Regular',Menlo,monospace;
+  --wrap:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--body);line-height:1.65;font-size:16px;overflow-x:hidden}
+a{color:var(--teal);text-decoration:none}
+a:hover{color:var(--teal-dk);text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+img,svg{max-width:100%;display:block}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-height:1.15;text-wrap:balance}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+.eyebrow.amber{color:var(--amber)}
+.lead{font-size:18px;color:var(--body);max-width:62ch}
+.muted{color:var(--muted)}
+.btn{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:13px 24px;border-radius:2px;border:1.5px solid var(--navy);color:var(--navy);transition:.2s}
+.btn:hover{background:var(--navy);color:#fff;text-decoration:none}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.primary:hover{background:var(--teal-dk);border-color:var(--teal-dk)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(247,244,238,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink)}
+.brand:hover{text-decoration:none}
+.mono{font-family:var(--serif);font-size:30px;letter-spacing:-2px;line-height:1}
+.mono .c{color:var(--teal)}.mono .e{color:var(--navy)}.mono .l{color:var(--amber)}
+.brand-text{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1.35}
+.brand-text strong{display:block;color:var(--ink);font-size:11px}
+.links{display:flex;gap:28px;list-style:none}
+.links a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--body);padding:6px 0;border-bottom:2px solid transparent}
+.links a:hover{color:var(--teal);text-decoration:none}
+.links a.active{color:var(--navy);border-color:var(--amber)}
+.menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:2px;padding:8px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);cursor:pointer}
+@media(max-width:820px){
+  .links{display:none;position:absolute;left:0;right:0;top:68px;background:var(--cream);border-bottom:1px solid var(--line);flex-direction:column;gap:0;padding:8px 20px 16px}
+  .links.open{display:flex}
+  .links a{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
+  .links a.active{border-color:var(--amber)}
+  .menu-btn{display:block}
+}
+
+/* hero */
+.hero{padding-block:72px 56px;border-bottom:1px solid var(--line);background:var(--paper)}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(38px,5vw,60px);margin:14px 0 20px}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero p{font-size:18px;max-width:58ch;margin-bottom:32px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.hero-art{aspect-ratio:1/1;max-width:420px;justify-self:end;width:100%}
+@media(max-width:820px){.hero .wrap{grid-template-columns:1fr;gap:32px}.hero-art{max-width:300px;justify-self:start}.hero{padding-block:44px 40px}}
+
+/* page header (inner pages) */
+.page-head{padding-block:56px 40px;border-bottom:1px solid var(--line);background:var(--paper)}
+.page-head h1{font-size:clamp(34px,4.2vw,50px);margin:12px 0 16px}
+.page-head p{max-width:62ch;font-size:17px}
+.page-head .wrap{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end}
+.page-head .thumb{width:260px;aspect-ratio:3/2}
+@media(max-width:820px){.page-head .wrap{grid-template-columns:1fr}.page-head .thumb{width:100%;max-width:360px}}
+
+section.block{padding-block:64px}
+section.block.alt{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:32px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(28px,3.2vw,38px)}
+.sec-head a.more{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+
+/* theme cards */
+.grid{display:grid;gap:24px}
+.grid.themes{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;color:inherit}
+a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 28px rgba(22,34,46,.09)}
+.card .thumb{aspect-ratio:3/2;background:var(--cream);border-bottom:1px solid var(--line)}
+.card .thumb svg{width:100%;height:100%}
+.card-body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:21px}
+.card p{font-size:14.5px;color:var(--body)}
+.card .cta{margin-top:auto;padding-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+
+/* projects */
+.proj-list{display:grid;gap:18px}
+.proj{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:3px;padding:24px 26px;display:grid;grid-template-columns:1fr;gap:10px}
+.proj .meta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border-radius:2px;background:var(--cream);border:1px solid var(--line);color:var(--navy)}
+.tag.role{background:var(--navy);color:#fff;border-color:var(--navy)}
+.proj h3{font-size:22px}
+.proj p{font-size:15px;max-width:80ch}
+.proj .themes a{font-size:13px}
+
+/* people */
+.pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
+.avatar{background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;aspect-ratio:1/1}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar .ini{font-family:var(--serif);font-size:56px;color:rgba(255,255,255,.9);letter-spacing:-2px;position:relative;z-index:1}
+.avatar svg.bg{position:absolute;inset:0;width:100%;height:100%;opacity:.25}
+.pi-body{padding:28px 32px;display:flex;flex-direction:column;gap:10px}
+.pi-body h3{font-size:28px}
+.pi-body .role{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.pi-body p{font-size:15px;max-width:70ch}
+.pi-links{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+@media(max-width:700px){.pi-card{grid-template-columns:1fr}.avatar{max-width:220px}}
+.grid.people{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.person{background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.person .avatar{aspect-ratio:4/3}
+.person .avatar .ini{font-size:46px}
+.person-body{padding:18px 20px 22px}
+.person h3{font-size:20px;margin-bottom:4px}
+.person .role{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.person p{font-size:14px;margin-top:8px}
+
+/* publications */
+.pub-group{margin-bottom:44px}
+.pub-group h2{font-size:26px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--navy)}
+.pub{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}
+.pub .year{font-family:var(--serif);font-size:24px;color:var(--navy);line-height:1.2;font-variant-numeric:tabular-nums}
+.pub .title{font-family:var(--serif);font-size:18px;color:var(--ink);line-height:1.35}
+.pub .title a{color:var(--ink)}
+.pub .title a:hover{color:var(--teal)}
+.pub .authors{font-size:14px;color:var(--body);margin-top:4px}
+.pub .venue{font-size:13.5px;color:var(--amber);font-style:italic;margin-top:2px}
+.pub .links{margin-top:6px;gap:14px}
+.pub .links a{font-size:10.5px;border:none;padding:0}
+@media(max-width:520px){.pub{grid-template-columns:1fr;gap:4px}}
+
+/* theme page */
+.theme-cols{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:start}
+.theme-cols .min{min-width:0}
+.issues{list-style:none;display:grid;gap:12px;margin-top:16px}
+.issues li{padding:14px 18px;background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;font-size:15px}
+.side h3{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.side .pub{grid-template-columns:1fr;gap:2px;padding:12px 0}
+.side .pub .title{font-size:16px}
+.side ul{list-style:none;display:grid;gap:10px}
+.side li a{font-size:15px}
+.side .empty{font-size:14px;color:var(--muted)}
+.side + .side{margin-top:36px}
+@media(max-width:820px){.theme-cols{grid-template-columns:1fr;gap:40px}}
+
+/* events */
+.event{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:260px 1fr;gap:0;overflow:hidden;margin-bottom:24px}
+.event .poster{background:var(--mist);border-right:1px solid var(--line)}
+.event .poster img{width:100%;height:100%;object-fit:cover}
+.event-body{padding:26px 30px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.event-body h3{font-size:24px}
+.event .when{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.event p{font-size:15px;max-width:70ch}
+.speakers{display:grid;gap:6px;margin-top:4px}
+.speakers div{font-size:14.5px}
+.speakers strong{color:var(--ink);font-weight:500}
+.event .fine{font-size:13px;color:var(--muted)}
+.event .fine a{font-size:13px}
+@media(max-width:700px){.event{grid-template-columns:1fr}.event .poster{max-height:360px;border-right:none;border-bottom:1px solid var(--line)}.event .poster img{object-position:top}}
+.news-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.news{border-top:2px solid var(--navy);padding-top:14px}
+.news .kind{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.news h3{font-size:19px;margin:6px 0}
+.news p{font-size:14px}
+
+/* ongoing */
+.ongoing{display:grid;gap:12px;margin-top:16px}
+.ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
+.ongoing strong{display:block;color:var(--ink);font-weight:500}
+
+/* opportunities */
+.openings{display:grid;gap:16px;margin-bottom:40px}
+.opening{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:3px;padding:22px 26px}
+.opening h3{font-size:21px;margin-bottom:6px}
+.opening p{font-size:15px}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.c-item{display:grid;grid-template-columns:52px 1fr;gap:14px;margin-bottom:22px}
+.c-item .ic{width:44px;height:44px;background:var(--navy);color:var(--amber);font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;border-radius:2px}
+.c-item strong{display:block;font-size:13px;color:var(--ink);margin-bottom:2px}
+.c-item span{font-size:14.5px}
+.placeholder{color:var(--muted);font-style:italic}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:28px 30px}
+.note h3{font-size:22px;margin-bottom:10px}
+.note p{font-size:15px}
+@media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
+
+/* footer */
+footer{background:var(--ink);color:rgba(255,255,255,.55);padding-block:36px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer .mono{font-size:22px}
+footer .mono .e{color:#fff}
+footer a{color:rgba(255,255,255,.75)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+"""
+
+# ───────────────────────── SVG thumbnails ─────────────────────────
+PAL = {"r": "#a8c5da", "c": "#e8a020", "g": "#5a9e6f", "w": "#4a90c4", "i": "#9b8ea0", "rd": "#d4cfc8",
+       "navy": "#1a3a5c", "teal": "#0e7c7b", "amber": "#d9901a", "mist": "#e6e0d6", "cream": "#f7f4ee"}
+
+def svg_wrap(body, w=300, h=200, bg=PAL["cream"]):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" role="img" aria-hidden="true">'
+            f'<rect width="{w}" height="{h}" fill="{bg}"/>{body}</svg>')
+
+def thumb_growth():
+    rnd = random.Random(1); b = []
+    cx, cy = 150, 100
+    for gx in range(0, 300, 15):
+        for gy in range(0, 200, 15):
+            d = math.hypot(gx + 7 - cx, gy + 7 - cy)
+            p = max(0, 1 - d / 150) + rnd.uniform(-.18, .18)
+            if p > .62: col = PAL["navy"]; op = .95
+            elif p > .42: col = PAL["teal"]; op = .75
+            elif p > .28: col = PAL["r"]; op = .9
+            else: continue
+            b.append(f'<rect x="{gx+1}" y="{gy+1}" width="13" height="13" fill="{col}" opacity="{op}"/>')
+    for r in (55, 95, 135):
+        b.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{PAL["amber"]}" stroke-width="1.2" stroke-dasharray="4 4"/>')
+    return svg_wrap("".join(b))
+
+def thumb_access():
+    b = []
+    for x in range(0, 300, 30): b.append(f'<line x1="{x}" y1="0" x2="{x}" y2="200" stroke="{PAL["mist"]}" stroke-width="1.5"/>')
+    for y in range(0, 200, 30): b.append(f'<line x1="0" y1="{y}" x2="300" y2="{y}" stroke="{PAL["mist"]}" stroke-width="1.5"/>')
+    fac = [(75, 70, PAL["teal"]), (200, 55, PAL["amber"]), (150, 140, PAL["navy"]), (245, 150, PAL["teal"])]
+    for x, y, c in fac:
+        for r, op in ((70, .10), (46, .16), (24, .26)):
+            b.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity="{op}"/>')
+    rnd = random.Random(3)
+    for _ in range(70):
+        x, y = rnd.randint(8, 292), rnd.randint(8, 192)
+        near = min(math.hypot(x - fx, y - fy) for fx, fy, _ in fac)
+        col = PAL["navy"] if near < 60 else PAL["i"]
+        b.append(f'<circle cx="{x}" cy="{y}" r="2.2" fill="{col}" opacity=".8"/>')
+    for x, y, c in fac:
+        b.append(f'<rect x="{x-7}" y="{y-7}" width="14" height="14" fill="{c}" stroke="#fff" stroke-width="2"/>')
+    return svg_wrap("".join(b))
+
+def thumb_commute():
+    b = []
+    blocks = [(20, 30, PAL["r"]), (20, 120, PAL["r"]), (120, 20, PAL["i"]), (250, 40, PAL["c"]), (235, 130, PAL["c"]), (120, 140, PAL["g"])]
+    for x, y, c in blocks:
+        for i in range(3):
+            for j in range(2):
+                b.append(f'<rect x="{x+i*14}" y="{y+j*14}" width="11" height="11" fill="{c}" opacity=".85"/>')
+    hub = (160, 95)
+    for x, y, c in blocks:
+        sx, sy = x + 20, y + 14
+        mx, my = (sx + hub[0]) / 2, (sy + hub[1]) / 2 - 25
+        b.append(f'<path d="M{sx} {sy} Q{mx} {my} {hub[0]} {hub[1]}" fill="none" stroke="{PAL["navy"]}" stroke-width="2.2" opacity=".55"/>')
+        b.append(f'<circle cx="{sx}" cy="{sy}" r="3.5" fill="{PAL["navy"]}"/>')
+    b.append(f'<circle cx="{hub[0]}" cy="{hub[1]}" r="11" fill="{PAL["teal"]}" stroke="#fff" stroke-width="3"/>')
+    return svg_wrap("".join(b))
+
+def thumb_housing():
+    b = []; rnd = random.Random(7)
+    cols = 12; w = 300 / cols
+    for i in range(cols):
+        x = i * w
+        hgt = 40 + rnd.randint(0, 80)
+        price = i / (cols - 1)
+        col = PAL["teal"] if price < .35 else (PAL["amber"] if price < .7 else PAL["navy"])
+        b.append(f'<rect x="{x+3}" y="{170-hgt}" width="{w-6}" height="{hgt}" fill="{col}" opacity=".8"/>')
+        b.append(f'<path d="M{x+1} {170-hgt} L{x+w/2} {170-hgt-12} L{x+w-1} {170-hgt} Z" fill="{col}"/>')
+        for wy in range(int(170 - hgt + 8), 165, 12):
+            b.append(f'<rect x="{x+w/2-2}" y="{wy}" width="4" height="5" fill="#fff" opacity=".8"/>')
+    b.append(f'<line x1="0" y1="172" x2="300" y2="172" stroke="{PAL["navy"]}" stroke-width="2"/>')
+    b.append(f'<path d="M20 190 L280 190" stroke="{PAL["amber"]}" stroke-width="3" stroke-dasharray="2 6" opacity=".9"/>')
+    return svg_wrap("".join(b))
+
+def thumb_agglom():
+    b = []; rnd = random.Random(11)
+    centers = [(90, 90, 46, PAL["navy"]), (215, 70, 30, PAL["teal"]), (200, 150, 22, PAL["amber"])]
+    for cx, cy, R, col in centers:
+        b.append(f'<circle cx="{cx}" cy="{cy}" r="{R+18}" fill="{col}" opacity=".10"/>')
+        for _ in range(int(R * 1.3)):
+            a = rnd.uniform(0, 6.283); r = R * math.sqrt(rnd.random())
+            s = rnd.uniform(1.8, 4.2)
+            b.append(f'<circle cx="{cx+r*math.cos(a):.1f}" cy="{cy+r*math.sin(a):.1f}" r="{s:.1f}" fill="{col}" opacity=".85"/>')
+    for _ in range(25):
+        b.append(f'<circle cx="{rnd.randint(5,295)}" cy="{rnd.randint(5,195)}" r="1.8" fill="{PAL["i"]}" opacity=".6"/>')
+    b.append(f'<path d="M90 90 L215 70 L200 150 Z" fill="none" stroke="{PAL["navy"]}" stroke-width="1.2" stroke-dasharray="3 4" opacity=".6"/>')
+    return svg_wrap("".join(b))
+
+def thumb_landuse():
+    rnd = random.Random(5); b = []
+    pattern = "r r r g g w w c c r r i i r r g g c c r".split()
+    cell = 15
+    for gy in range(0, 200, cell):
+        for gx in range(0, 300, cell):
+            k = pattern[(gx // cell + (gy // cell) * 3) % len(pattern)]
+            if rnd.random() < .12: k = "rd"
+            b.append(f'<rect x="{gx+1}" y="{gy+1}" width="{cell-2}" height="{cell-2}" fill="{PAL[k]}" opacity=".9"/>')
+    b.append(f'<rect x="90" y="55" width="120" height="90" fill="none" stroke="{PAL["navy"]}" stroke-width="2.5"/>')
+    b.append(f'<rect x="90" y="55" width="120" height="90" fill="{PAL["navy"]}" opacity=".08"/>')
+    return svg_wrap("".join(b))
+
+def thumb_finance():
+    rnd = random.Random(9); b = []
+    b.append(f'<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="{PAL["amber"]}" stroke-width="2"/></pattern></defs>')
+    for gy in range(10, 190, 36):
+        x = 10
+        while x < 290:
+            w = rnd.choice([28, 40, 52, 64])
+            if x + w > 290: w = 290 - x
+            st = rnd.random()
+            if st < .55: fill = PAL["r"]
+            elif st < .8: fill = "url(#hatch)"
+            else: fill = PAL["mist"]
+            b.append(f'<rect x="{x}" y="{gy}" width="{w}" height="30" fill="{fill}" stroke="{PAL["navy"]}" stroke-width="1"/>')
+            x += w + 4
+    b.append(f'<rect x="10" y="10" width="280" height="180" fill="none" stroke="{PAL["navy"]}" stroke-width="2"/>')
+    return svg_wrap("".join(b))
+
+THUMBS = {
+    "urban-growth-simulation": thumb_growth,
+    "facility-mapping-accessibility": thumb_access,
+    "commuting-built-environment-typologies": thumb_commute,
+    "housing-affordability-segregation": thumb_housing,
+    "industrial-agglomeration-growth": thumb_agglom,
+    "land-use-optimisation": thumb_landuse,
+    "municipal-finance-property-tax": thumb_finance,
+}
+
+def hero_art():
+    # network of city nodes over faint grid
+    b = []
+    for x in range(0, 320, 20): b.append(f'<line x1="{x}" y1="0" x2="{x}" y2="320" stroke="{PAL["mist"]}" stroke-width="1"/>')
+    for y in range(0, 320, 20): b.append(f'<line x1="0" y1="{y}" x2="320" y2="{y}" stroke="{PAL["mist"]}" stroke-width="1"/>')
+    nodes = [(160, 50, 14, PAL["amber"]), (70, 130, 11, PAL["navy"]), (260, 120, 11, PAL["navy"]), (160, 170, 18, PAL["teal"]),
+             (110, 260, 10, PAL["navy"]), (230, 255, 10, PAL["navy"]), (40, 230, 7, PAL["i"]), (290, 215, 7, PAL["i"])]
+    edges = [(0, 1), (0, 2), (0, 3), (1, 3), (2, 3), (3, 4), (3, 5), (1, 4), (2, 5), (4, 6), (5, 7), (1, 6), (2, 7)]
+    for i, j in edges:
+        a, c = nodes[i], nodes[j]
+        b.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{c[0]}" y2="{c[1]}" stroke="{PAL["navy"]}" stroke-width="1.6" opacity=".45"/>')
+    for x, y, r, col in nodes:
+        b.append(f'<circle cx="{x}" cy="{y}" r="{r+6}" fill="{col}" opacity=".12"/>')
+        b.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{col}"/>')
+    return svg_wrap("".join(b), 320, 320, "none").replace('<rect width="320" height="320" fill="none"/>', "")
+
+def avatar_bg(seed):
+    rnd = random.Random(seed); b = []
+    keys = ["r", "c", "g", "w", "i", "rd"]
+    for gy in range(0, 120, 12):
+        for gx in range(0, 120, 12):
+            b.append(f'<rect x="{gx}" y="{gy}" width="11" height="11" fill="{PAL[rnd.choice(keys)]}"/>')
+    return f'<svg class="bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">{"".join(b)}</svg>'
+
+# ───────────────────────── Templates ─────────────────────────
+NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", "Projects"),
+       ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "Events"),
+       ("opportunities.html", "Join us"), ("contact.html", "Contact")]
+
+def page(title, body, active, depth=0, desc=None):
+    root = "../" * depth
+    desc = desc or LAB["description"][:155]
+    links = "".join(f'<li><a href="{root}{href}"{" class=\"active\"" if href == active else ""}>{lab}</a></li>' for href, lab in NAV)
+    brand = (f'<a class="brand" href="{root}index.html"><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span>'
+             f'<span class="brand-text"><strong>{LAB["short"]}</strong>{LAB["inst"]}</span></a>')
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{e(title)} · {LAB["short"]}, {LAB["inst"]}</title>
+<meta name="description" content="{e(desc)}">
+<meta property="og:title" content="{e(title)} · {LAB["short"]}">
+<meta property="og:description" content="{e(desc)}">
+<meta property="og:type" content="website">
+<link rel="icon" href="{root}assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{root}assets/style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  {brand}
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
+  <ul class="links" id="navLinks">{links}</ul>
+</div></header>
+<main>
+{body}
+</main>
+<footer><div class="wrap">
+  <div><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span></div>
+  <div>{LAB["name"]} · {LAB["inst"]}</div>
+  <div>© {LAB["year"]} {LAB["short"]}</div>
+</div></footer>
+<script>
+(function(){{var b=document.getElementById('menuBtn'),l=document.getElementById('navLinks');
+b.addEventListener('click',function(){{var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'Close':'Menu';}});}})();
+</script>
+</body>
+</html>
+"""
+
+def theme_card(t, root=""):
+    return (f'<a class="card" href="{root}research/{t["slug"]}.html"><div class="thumb">{THUMBS[t["slug"]]()}</div>'
+            f'<div class="card-body"><h3>{e(t["title"])}</h3><p>{e(t["short"])}</p><span class="cta">Read more →</span></div></a>')
+
+def pub_html(p, root="", compact=False):
+    title = f'<a href="{p["url"]}" target="_blank" rel="noopener">{e(p["title"])}</a>' if p["url"] else e(p["title"])
+    yr = "" if compact else f'<div class="year">{p["year"]}</div>'
+    auth = f'{e(p["authors"])} ({p["year"]})' if compact else e(p["authors"])
+    return (f'<div class="pub">{yr}<div><div class="title">{title}</div><div class="authors">{auth}</div>'
+            f'<div class="venue">{e(p["venue"])}</div></div></div>')
+
+def project_html(pr, root=""):
+    th = ", ".join(f'<a href="{root}research/{s}.html">{e(THEME_BY_SLUG[s]["title"])}</a>' for s in pr["themes"])
+    return (f'<article class="proj"><div class="meta"><span class="tag role">{e(pr["role"])}</span></div>'
+            f'<h3>{e(pr["title"])}</h3><p>{e(pr["summary"])}</p><div class="themes muted">Theme: {th}</div></article>')
+
+ALL_PUBS = [p for g in PUBLICATIONS for p in g["items"]]
+EVENTS_SORTED = sorted(EVENTS, key=lambda ev: ev["date"], reverse=True)
+
+def event_html(ev, root=""):
+    poster = f'<div class="poster"><img src="{root}{ev["poster"]}" alt="Poster: {e(ev["title"])}" loading="lazy"></div>' if ev.get("poster") else ""
+    speakers = "".join(f'<div><strong>{e(s["name"])}</strong> — {e(s["aff"])}</div>' for s in ev.get("speakers", []))
+    fine = " · ".join(x for x in [f'Convener: {e(ev["convener"])}' if ev.get("convener") else "", e(ev.get("support", ""))] if x)
+    return (f'<article class="event">{poster}<div class="event-body">'
+            f'<div class="when">{e(ev["kind"])} · {e(ev["date_text"])}</div><h3>{e(ev["title"])}</h3>'
+            f'<p>{e(ev["summary"])}</p><div class="speakers">{speakers}</div>'
+            f'<p class="fine">{e(ev["venue"])}</p><p class="fine">{fine}</p></div></article>')
+
+# ───────────────────────── Pages ─────────────────────────
+def build_index():
+    themes = "".join(theme_card(t) for t in THEMES)
+    projects = "".join(project_html(p) for p in PROJECTS)
+    recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
+    news = "".join(f'<div class="news"><div class="kind">{e(ev["kind"])} · {e(ev["date_text"])}</div><h3><a href="events.html">{e(ev["title"])}</a></h3>'
+                   f'<p>{e(", ".join(s["name"] for s in ev.get("speakers", [])))}</p></div>' for ev in EVENTS_SORTED[:3])
+    body = f"""
+<section class="hero"><div class="wrap">
+  <div>
+    <div class="eyebrow">{e(LAB["name"])}</div>
+    <h1>Cities as places to <em>experiment</em> and <em>learn</em></h1>
+    <p>{e(LAB["description"])}</p>
+    <div class="hero-actions"><a class="btn primary" href="research.html">Research themes</a><a class="btn" href="people.html">Meet the team</a></div>
+  </div>
+  <div class="hero-art">{hero_art()}</div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Research</div><h2>What we work on</h2></div><a class="more" href="research.html">All themes →</a></div>
+  <div class="grid themes">{themes}</div>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Projects</div><h2>Current projects</h2></div><a class="more" href="projects.html">Project details →</a></div>
+  <div class="proj-list">{projects}</div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Publications</div><h2>Recent publications</h2></div><a class="more" href="publications.html">All publications →</a></div>
+  <div class="pub-list">{recent}</div>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Events &amp; news</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All events →</a></div>
+  <div class="news-strip">{news}</div>
+</div></section>
+"""
+    return page("Home", body, "index.html")
+
+def build_research():
+    themes = "".join(theme_card(t) for t in THEMES)
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Research</div><h1>Seven questions about Indian cities</h1>
+  <p>Our work is organised around seven themes. Each page describes what the theme is about, the issues we tackle, and the projects and publications that sit under it.</p>
+</div></div></section>
+<section class="block"><div class="wrap"><div class="grid themes">{themes}</div></div></section>
+"""
+    return page("Research", body, "research.html")
+
+def build_theme(t):
+    pubs = [p for p in ALL_PUBS if t["slug"] in p["themes"]]
+    projs = [p for p in PROJECTS if t["slug"] in p["themes"]]
+    issues = "".join(f"<li>{e(i)}</li>" for i in t["issues"])
+    pub_block = "".join(pub_html(p, "../", compact=True) for p in pubs) or '<p class="empty">No publications under this theme yet.</p>'
+    ongoing = [o for o in ONGOING if o["theme"] == t["slug"]]
+    ongoing_block = ""
+    if ongoing:
+        ongoing_block = ('<h2 style="font-size:26px;margin-top:40px">Work in progress</h2><div class="ongoing">' +
+                         "".join(f'<div><strong>{e(o["title"])}</strong>{e(o["note"])}</div>' for o in ongoing) + "</div>")
+    proj_block = ("<ul>" + "".join(f'<li><a href="../projects.html">{e(p["title"])}</a> <span class="muted">({e(p["role"])})</span></li>' for p in projs) + "</ul>") if projs else '<p class="empty">No active projects under this theme yet.</p>'
+    body = f"""
+<section class="page-head"><div class="wrap">
+  <div><div class="eyebrow"><a href="../research.html">Research</a> / Theme</div><h1>{e(t["title"])}</h1><p>{e(t["short"])}</p></div>
+  <div class="thumb">{THUMBS[t["slug"]]()}</div>
+</div></section>
+<section class="block"><div class="wrap theme-cols">
+  <div class="min">
+    <div class="eyebrow">About this theme</div>
+    <p class="lead" style="margin-top:10px">{e(t["intro"])}</p>
+    <h2 style="font-size:26px;margin-top:40px">Issues we tackle</h2>
+    <ul class="issues">{issues}</ul>
+    {ongoing_block}
+  </div>
+  <aside class="min">
+    <div class="side"><h3>Related projects</h3>{proj_block}</div>
+    <div class="side"><h3>Related publications</h3>{pub_block}</div>
+    <div class="side"><h3>People</h3><ul><li><a href="../people.html">{e(PEOPLE["pi"]["name"])}</a> <span class="muted">(PI)</span></li></ul></div>
+  </aside>
+</div></section>
+"""
+    return page(t["title"], body, "research.html", depth=1, desc=t["short"])
+
+def build_projects():
+    projects = "".join(project_html(p) for p in PROJECTS)
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Projects</div><h1>Funded and partnered research</h1>
+  <p>Projects led or co-led by CEL Lab, working with state and city governments on evidence they can act on.</p>
+</div></div></section>
+<section class="block"><div class="wrap"><div class="proj-list">{projects}</div></div></section>
+"""
+    return page("Projects", body, "projects.html")
+
+def build_people():
+    pi = PEOPLE["pi"]
+    av = f'<img src="{pi["photo"]}" alt="{e(pi["name"])}">' if pi["photo"] else f'{avatar_bg(1)}<span class="ini">{pi["initials"]}</span>'
+    links = "".join(f'<a href="{l["url"]}" target="_blank" rel="noopener">{e(l["label"])} ↗</a>' for l in pi["links"])
+    scholars = ""
+    for i, s in enumerate(PEOPLE["scholars"]):
+        sav = f'<img src="{s["photo"]}" alt="{e(s["name"])}">' if s["photo"] else f'{avatar_bg(10+i)}<span class="ini">{s["initials"]}</span>'
+        topic = f'<p>{e(s["topic"])}</p>' if s["topic"] else ""
+        scholars += f'<div class="person"><div class="avatar">{sav}</div><div class="person-body"><h3>{e(s["name"])}</h3><div class="role">{e(s["role"])}</div>{topic}</div></div>'
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">People</div><h1>The team</h1>
+  <p>A small group of urban economists and spatial analysts at {LAB["inst"]}.</p>
+</div></div></section>
+<section class="block"><div class="wrap">
+  <div class="eyebrow" style="margin-bottom:14px">Principal Investigator</div>
+  <div class="pi-card"><div class="avatar">{av}</div><div class="pi-body">
+    <h3>{e(pi["name"])}</h3><div class="role">{e(pi["role"])} · {e(pi["degree"])}</div>
+    <p>{e(pi["bio"])}</p><div class="pi-links">{links}</div>
+  </div></div>
+  <div class="eyebrow" style="margin-bottom:14px">Research Scholars</div>
+  <div class="grid people">{scholars}</div>
+</div></section>
+"""
+    return page("People", body, "people.html")
+
+def build_publications():
+    groups = ""
+    for g in PUBLICATIONS:
+        items = "".join(pub_html(p) for p in sorted(g["items"], key=lambda p: -p["year"]))
+        groups += f'<div class="pub-group"><h2>{e(g["type"])}</h2>{items}</div>'
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Publications</div><h1>Papers, working papers and cases</h1>
+  <p>Research output from CEL Lab and its members. Titles link to the publisher's page where available.</p>
+</div></div></section>
+<section class="block"><div class="wrap">{groups}</div></section>
+"""
+    return page("Publications", body, "publications.html")
+
+def build_contact():
+    email = f'<span>{e(LAB["email"])}</span>' if LAB["email"] else '<span class="placeholder">Email address to be added</span>'
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Contact</div><h1>Get in touch</h1>
+  <p>For research collaborations, PhD and internship enquiries, or requests from city and state governments.</p>
+</div></div></section>
+<section class="block"><div class="wrap contact-grid">
+  <div>
+    <div class="c-item"><div class="ic">MAIL</div><div><strong>Email</strong>{email}</div></div>
+    <div class="c-item"><div class="ic">LOC</div><div><strong>Address</strong><span>{e(LAB["address"])}</span></div></div>
+    <div class="c-item"><div class="ic">WEB</div><div><strong>Web</strong><span>{LAB["domain"]}</span></div></div>
+  </div>
+  <div class="note"><h3>Join the lab</h3>
+    <p>We welcome enquiries from prospective PhD students and interns with a background in economics, planning, geography or data science, and from municipal and state agencies interested in collaborative, evidence-based projects. Write to us with a short note on your interests.</p>
+  </div>
+</div></section>
+"""
+    return page("Contact", body, "contact.html")
+
+def build_events():
+    items = "".join(event_html(ev) for ev in EVENTS_SORTED) or '<p class="muted">No events listed yet.</p>'
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Events &amp; news</div><h1>Seminars, talks and news</h1>
+  <p>Events organised by CEL Lab, invited talks, and other news from the group.</p>
+</div></div></section>
+<section class="block"><div class="wrap">{items}</div></section>
+"""
+    return page("Events & News", body, "events.html")
+
+def build_opportunities():
+    ops = OPPORTUNITIES["openings"]
+    openings = ("".join(f'<div class="opening"><h3>{e(o["title"])}</h3><p>{e(o["note"])}</p>' +
+                        (f'<p class="muted" style="margin-top:6px">Deadline: {e(o["deadline"])}</p>' if o.get("deadline") else "") + "</div>" for o in ops)
+                if ops else '<div class="opening"><h3>No funded openings at the moment</h3><p>New positions are announced here as projects are funded.</p></div>')
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Join us</div><h1>Opportunities</h1>
+  <p>PhD positions, research fellowships and internships at CEL Lab.</p>
+</div></div></section>
+<section class="block"><div class="wrap">
+  <div class="eyebrow" style="margin-bottom:14px">Current openings</div>
+  <div class="openings">{openings}</div>
+  <div class="note"><h3>Prospective students and interns</h3><p>{e(OPPORTUNITIES["standing"])}</p>
+  <p style="margin-top:14px"><a class="btn" href="contact.html">Contact the lab</a></p></div>
+</div></section>
+"""
+    return page("Opportunities", body, "opportunities.html")
+
+FAVICON = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="8" fill="{PAL["navy"]}"/><text x="32" y="44" text-anchor="middle" font-family="Georgia,serif" font-size="34" fill="#fff">C</text></svg>'
+
+def main():
+    shutil.rmtree(OUT, ignore_errors=True)
+    os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research"))
+    w = lambda rel, s: open(os.path.join(OUT, rel), "w", encoding="utf-8").write(s)
+    w("assets/style.css", CSS.strip() + "\n")
+    w("assets/favicon.svg", FAVICON)
+    w("index.html", build_index()); w("research.html", build_research()); w("projects.html", build_projects())
+    w("people.html", build_people()); w("publications.html", build_publications()); w("contact.html", build_contact())
+    w("events.html", build_events()); w("opportunities.html", build_opportunities())
+    src_assets = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site-src-assets")
+    if os.path.isdir(src_assets):
+        shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
+    for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
+    w("CNAME", LAB["domain"] + "\n")
+    print("built", sum(len(f) for _, _, f in os.walk(OUT)), "files in", OUT)
+
+if __name__ == "__main__":
+    main()
