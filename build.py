@@ -769,6 +769,7 @@ def build_contact():
     {('<input type="hidden" name="access_key" value="' + e(LAB["form_access_key"]) + '">') if LAB.get("form_access_key") else ""}
     <input type="hidden" name="subject" value="New enquiry via cel-lab.in contact form">
     <input type="hidden" name="from_name" value="CEL Lab website">
+    <input type="hidden" name="redirect" id="f-redirect" value="">
     <input type="checkbox" class="hp" name="botcheck" tabindex="-1" autocomplete="off">
     <button class="btn primary" type="submit" id="f-send">Send message</button>
     <div class="fmsg" id="f-status" aria-live="polite"></div>
@@ -778,7 +779,11 @@ def build_contact():
 (function(){{
   var f=document.getElementById('contactForm'),st=document.getElementById('f-status'),btn=document.getElementById('f-send');
   var endpoint={endpoint!r}, to={LAB["email"]!r};
+  var here=location.href.split('?')[0].split('#')[0];
+  document.getElementById('f-redirect').value=here+'?sent=1';
+  if(location.search.indexOf('sent=1')>-1){{st.className='fmsg ok';st.textContent='Thank you — your message has been sent.';f.scrollIntoView();}}
   f.addEventListener('submit',function(ev){{
+    if(f.dataset.native==='1'){{return;}}
     ev.preventDefault();
     if(!f.checkValidity()){{st.className='fmsg err';st.textContent='Please fill in your name, email and query.';return;}}
     var d=new FormData(f);
@@ -789,11 +794,11 @@ def build_contact():
       st.className='fmsg ok';st.textContent='Your email app should open with the message filled in. If it does not, write to '+to+'.';return;
     }}
     btn.disabled=true;st.className='fmsg';st.textContent='Sending…';
-    fetch(endpoint,{{method:'POST',body:d,headers:{{'Accept':'application/json'}}}}).then(function(r){{
-      if(r.ok){{f.reset();st.className='fmsg ok';st.textContent='Thank you — your message has been sent.';}}
-      else{{st.className='fmsg err';st.textContent='Something went wrong. Please email '+to+' directly.';}}
-    }}).catch(function(){{st.className='fmsg err';st.textContent='Could not send. Please email '+to+' directly.';}})
-    .finally(function(){{btn.disabled=false;}});
+    var obj={{}};d.forEach(function(v,k){{obj[k]=v;}});delete obj.redirect;
+    fetch(endpoint,{{method:'POST',headers:{{'Content-Type':'application/json','Accept':'application/json'}},body:JSON.stringify(obj)}}).then(function(r){{return r.json();}}).then(function(j){{
+      if(j&&j.success){{f.reset();st.className='fmsg ok';st.textContent='Thank you — your message has been sent.';btn.disabled=false;}}
+      else{{throw new Error(j&&j.message||'failed');}}
+    }}).catch(function(){{ /* fall back to a normal form post; Web3Forms redirects back here */ btn.disabled=false; f.dataset.native='1'; HTMLFormElement.prototype.submit.call(f); }});
   }});
 }})();
 </script>
