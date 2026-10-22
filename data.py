@@ -9,7 +9,8 @@ LAB = {
     "email": "aviral.marwal@hs.iitr.ac.in",
     "domain": "cel-lab.in",
     "cname_live": False,
-    "form_endpoint": "https://formspree.io/f/mwlleawn",   # Formspree endpoint, e.g. "https://formspree.io/f/abcdwxyz"; empty = email-client fallback    # set True after the domain's DNS points at GitHub Pages
+    "form_endpoint": "https://api.web3forms.com/submit",  # form backend; empty = email-client fallback
+    "form_access_key": "",   # Web3Forms access key (from web3forms.com)
     "description": (
         "CEL Lab is an urban economics and policy research group at IIT Roorkee. "
         "We treat cities as places to experiment and learn: building empirical evidence on "

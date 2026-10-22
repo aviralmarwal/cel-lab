@@ -739,7 +739,7 @@ def build_publications():
 
 def build_contact():
     email = f'<span>{e(LAB["email"])}</span>' if LAB["email"] else '<span class="placeholder">Email address to be added</span>'
-    endpoint = LAB.get("form_endpoint", "")
+    endpoint = LAB.get("form_endpoint", "") if LAB.get("form_access_key") or "web3forms" not in LAB.get("form_endpoint", "") else ""
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Contact</div><h1>Get in touch</h1>
@@ -766,7 +766,10 @@ def build_contact():
         </select></div>
     </div>
     <div class="fg"><label for="f-msg">Your query</label><textarea id="f-msg" name="message" required></textarea></div>
-    <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    {('<input type="hidden" name="access_key" value="' + e(LAB["form_access_key"]) + '">') if LAB.get("form_access_key") else ""}
+    <input type="hidden" name="subject" value="New enquiry via cel-lab.in contact form">
+    <input type="hidden" name="from_name" value="CEL Lab website">
+    <input type="checkbox" class="hp" name="botcheck" tabindex="-1" autocomplete="off">
     <button class="btn primary" type="submit" id="f-send">Send message</button>
     <div class="fmsg" id="f-status" aria-live="polite"></div>
   </form>
