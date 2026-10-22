@@ -141,6 +141,8 @@ PROJECTS = [
     {
         "title": "Assessment of Financial Resources of Local Self-Governing Institutions (PRIs and ULBs) in Uttarakhand",
         "role": "Co-PI",
+        "funder": "SETU Aayog, Government of Uttarakhand",
+        "years": "2025 – present",
         "summary": (
             "A state-wide assessment of the revenue base, expenditure patterns and fiscal capacity of Uttarakhand's "
             "panchayati raj institutions and urban local bodies, identifying constraints on own-source revenue and "
@@ -179,6 +181,29 @@ PROJECTS = [
         ),
         "partner": "CiSTUP, IISc Bengaluru",
         "themes": ["commuting-built-environment-typologies"],
+    },
+    {
+        "title": "Neighbourhood Accessibility and Gentrification",
+        "role": "PI",
+        "funder": "SRIC, IIT Roorkee",
+        "years": "2025 – present",
+        "summary": (
+            "Examines how changes in neighbourhood accessibility — new transit, roads and amenities — feed into "
+            "housing prices, household sorting and gentrification pressures in Indian cities, and what this means "
+            "for who benefits from urban investment."
+        ),
+        "themes": ["housing-affordability-segregation", "facility-mapping-accessibility"],
+    },
+    {
+        "title": "Mapping Opportunities for Healthy and Sustainable Urban Transitions in Post-Industrial Cities",
+        "role": "Collaborator",
+        "partner": "Urban Studies Foundation, UK",
+        "summary": (
+            "A research collaboration with the Urban Studies Foundation on how post-industrial cities can steer "
+            "transitions towards healthier and more sustainable urban environments, and where the opportunities "
+            "for such transitions lie."
+        ),
+        "themes": ["land-use-optimisation"],
     },
 ]
 
@@ -239,10 +264,22 @@ NEWS = [  # short dated items for the timeline and the home-page strip, newest f
     {"date": "2026-06", "date_text": "June 2026", "text": "Aviral attends the RSA Annual Conference in Sweden, funded by IIT Roorkee.", "link": "events.html"},
     {"date": "2025-12", "date_text": "December 2025", "text": "CEL Lab hosts the seminar \u201cMapping New Directions in Urbanisation\u201d with Arup Mitra (SAU) and Prafulla Parlewar (SPA Delhi), supported by the Urban Studies Foundation.", "link": "events.html"},
     {"date": "2025-12", "date_text": "December 2025", "text": "Participation in the Conference on Cities and Urban Planning in Ancient India, IIT Indore.", "link": "events.html"},
+    {"date": "2025-09", "date_text": "September 2025", "text": "New SRIC-funded project on neighbourhood accessibility and gentrification begins.", "link": "projects.html"},
     {"date": "2025-07", "date_text": "July 2025", "text": "Ankita Dey joins the lab as a PhD scholar, working on urban land use policy.", "link": "people.html"},
     {"date": "2025-05", "date_text": "May 2025", "text": "Work begins on the assessment of financial resources of PRIs and ULBs in Uttarakhand.", "link": "projects.html"},
     {"date": "2025-01", "date_text": "January 2025", "text": "Nikhil Mishra joins the lab as a PhD scholar, working on firm agglomeration and urbanisation.", "link": "people.html"},
     {"date": "2024-11", "date_text": "November 2024", "text": "CEL Lab is set up at the Department of Humanities & Social Sciences, IIT Roorkee.", "link": "index.html"},
+]
+
+TEACHING = [
+    {"code": "HS 535", "title": "Urban Economics", "term": "Autumn", "level": "PG / UG elective",
+     "desc": "Why cities exist, how they grow, and how land, housing and transport markets shape them. Covers agglomeration, bid-rent and urban form, housing, transport and local public finance, with Indian cases throughout."},
+    {"code": "HS 659", "title": "Spatial Data Analysis", "term": "Spring", "level": "PG",
+     "desc": "Working with spatial data in R and GIS: geocoding, spatial joins, exploratory spatial data analysis, spatial autocorrelation and spatial regression, applied to urban and regional questions."},
+    {"code": "HS 508", "title": "Institutional Economics", "term": "Spring", "level": "PG",
+     "desc": "How institutions — property rights, contracts, governance and the state — shape economic outcomes, with applications to land, cities and development."},
+    {"code": "HS 601", "title": "Welfare Economics", "term": "Autumn", "level": "PG",
+     "desc": "Efficiency, equity and social choice; market failure and public intervention; the normative foundations of policy evaluation."},
 ]
 
 OPPORTUNITIES = {
@@ -270,8 +307,8 @@ PEOPLE = {
         "photo": None,
     },
     "scholars": [
-        {"name": "Nikhil Mishra", "initials": "NM", "role": "Research Scholar · PhD", "topic": "", "photo": None},
-        {"name": "Ankita Dey", "initials": "AD", "role": "Research Scholar · PhD", "topic": "", "photo": None},
+        {"name": "Nikhil Mishra", "initials": "NM", "role": "Research Scholar · PhD (since Jan 2025)", "topic": "Firm agglomeration and urbanisation", "photo": None},
+        {"name": "Ankita Dey", "initials": "AD", "role": "Research Scholar · PhD (since Jul 2025)", "topic": "Urban land use policy", "photo": None},
     ],
 }
 

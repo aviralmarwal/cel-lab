@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
 import os, shutil, html, math, random
-from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS
+from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
 THEME_BY_SLUG = {t["slug"]: t for t in THEMES}
@@ -190,6 +190,14 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 @media(max-width:820px){.two-col{grid-template-columns:1fr}}
 .subhead{font-size:26px;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--navy)}
 
+/* teaching */
+.course{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 26px;display:grid;grid-template-columns:120px 1fr;gap:20px}
+.course .code{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--navy);padding-top:6px}
+.course .code small{display:block;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.12em;text-transform:uppercase}
+.course h3{font-size:22px;margin-bottom:6px}
+.course p{font-size:15px}
+@media(max-width:520px){.course{grid-template-columns:1fr;gap:8px}}
+
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
 .ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
@@ -377,7 +385,7 @@ def avatar_bg(seed):
 # ───────────────────────── Templates ─────────────────────────
 NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", "Projects"),
        ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News & Talks"),
-       ("opportunities.html", "Join us"), ("contact.html", "Contact")]
+       ("teaching.html", "Teaching"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
 
 def page(title, body, active, depth=0, desc=None):
     root = "../" * depth
@@ -436,7 +444,9 @@ def pub_html(p, root="", compact=False):
 
 def project_html(pr, root=""):
     th = ", ".join(f'<a href="{root}research/{s}.html">{e(THEME_BY_SLUG[s]["title"])}</a>' for s in pr["themes"])
-    tags = "".join(f'<span class="tag role">{e(pr["role"])}</span>' if pr.get("role") else "") + \
+    tags = (f'<span class="tag role">{e(pr["role"])}</span>' if pr.get("role") else "") + \
+           (f'<span class="tag">{e(pr["years"])}</span>' if pr.get("years") else "") + \
+           (f'<span class="tag">Funded by {e(pr["funder"])}</span>' if pr.get("funder") else "") + \
            (f'<span class="tag">Partner: {e(pr["partner"])}</span>' if pr.get("partner") else "")
     role = f'<div class="meta">{tags}</div>' if tags else ""
     return (f'<article class="proj">{role}'
@@ -640,6 +650,18 @@ def build_events():
 """
     return page("News & Talks", body, "events.html")
 
+def build_teaching():
+    courses = "".join(f'<div class="course"><div class="code">{e(c["code"])}<small>{e(c["term"])} · {e(c["level"])}</small></div>'
+                      f'<div><h3>{e(c["title"])}</h3><p>{e(c["desc"])}</p></div></div>' for c in TEACHING)
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Teaching</div><h1>Courses at IIT Roorkee</h1>
+  <p>Courses taught by lab members in the Department of Humanities &amp; Social Sciences. Students interested in a dissertation or project in urban economics are welcome to get in touch.</p>
+</div></div></section>
+<section class="block"><div class="wrap"><div class="proj-list">{courses}</div></div></section>
+"""
+    return page("Teaching", body, "teaching.html")
+
 def build_opportunities():
     ops = OPPORTUNITIES["openings"]
     openings = ("".join(f'<div class="opening"><h3>{e(o["title"])}</h3><p>{e(o["note"])}</p>' +
@@ -669,7 +691,7 @@ def main():
     w("assets/favicon.svg", FAVICON)
     w("index.html", build_index()); w("research.html", build_research()); w("projects.html", build_projects())
     w("people.html", build_people()); w("publications.html", build_publications()); w("contact.html", build_contact())
-    w("events.html", build_events()); w("opportunities.html", build_opportunities())
+    w("events.html", build_events()); w("opportunities.html", build_opportunities()); w("teaching.html", build_teaching())
     src_assets = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site-src-assets")
     if os.path.isdir(src_assets):
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
