@@ -282,6 +282,16 @@ TEACHING = [
      "desc": "Efficiency, equity and social choice; market failure and public intervention; the normative foundations of policy evaluation."},
 ]
 
+THESES = [  # master's and BS-MS thesis supervision; title "" = ongoing
+    {"name": "Akanksha Sahni", "prog": "BS-MS Economics", "year": "2026 – 27", "title": ""},
+    {"name": "Yash Kumar", "prog": "BS-MS Economics", "year": "2026 – 27", "title": ""},
+    {"name": "Kavish Jain", "prog": "BS-MS Economics", "year": "2026 – 27", "title": ""},
+    {"name": "Samiksha Bharti", "prog": "M.Sc. Economics", "year": "2025 – 26", "title": "A study of fiscal decentralisation in urban local bodies"},
+    {"name": "Arunesh Tomar", "prog": "BS-MS Economics", "year": "2025 – 26", "title": "Fracture points in trade: sub-sector export volatility, structural breaks, and policy implications in the post-COVID era"},
+    {"name": "Madhav Mukund", "prog": "BS-MS Economics", "year": "2025 – 26", "title": "Analysing the impact of public investment on economic growth and equity"},
+    {"name": "Vedant Dwivedi", "prog": "BS-MS Economics", "year": "2025 – 26", "title": "The role of informal institutions in shaping careers at IIT Roorkee and the determinants of entrepreneurship"},
+]
+
 OPPORTUNITIES = {
     "openings": [],  # e.g. {"title": "JRF, property tax and urban sprawl project", "note": "...", "deadline": "..."}
     "standing": (

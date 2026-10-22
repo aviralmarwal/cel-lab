@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
 import os, shutil, html, math, random
-from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING
+from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING, THESES
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
 THEME_BY_SLUG = {t["slug"]: t for t in THEMES}
@@ -666,12 +666,19 @@ def build_events():
 def build_teaching():
     courses = "".join(f'<div class="course"><div class="code">{e(c["code"])}<small>{e(c["term"])} · {e(c["level"])}</small></div>'
                       f'<div><h3>{e(c["title"])}</h3><p>{e(c["desc"])}</p></div></div>' for c in TEACHING)
+    theses = "".join(f'<div class="talk"><div class="d">{e(t["year"])}</div><div><div class="t">{e(t["name"])} <span class="muted" style="font-family:var(--sans);font-size:14px">· {e(t["prog"])}</span></div>'
+                     f'<div class="v">{e(t["title"]) if t["title"] else "<em>Thesis in progress</em>"}</div></div></div>' for t in THESES)
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Teaching</div><h1>Courses at IIT Roorkee</h1>
   <p>Courses taught by lab members in the Department of Humanities &amp; Social Sciences. Students interested in a dissertation or project in urban economics are welcome to get in touch.</p>
 </div></div></section>
 <section class="block"><div class="wrap"><div class="proj-list">{courses}</div></div></section>
+<section class="block alt"><div class="wrap">
+  <h2 class="subhead">Thesis supervision</h2>
+  <p class="muted" style="font-size:14px;margin-bottom:18px">Master's and BS-MS Economics theses supervised at IIT Roorkee. Doctoral supervision is listed on the <a href="people.html">People</a> page.</p>
+  {theses}
+</div></section>
 """
     return page("Teaching", body, "teaching.html")
 
