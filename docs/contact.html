@@ -32,7 +32,7 @@
     <div class="c-item"><div class="ic">LOC</div><div><strong>Address</strong><span>Department of Humanities &amp; Social Sciences, Indian Institute of Technology Roorkee, Roorkee 247667, Uttarakhand, India</span></div></div>
     <div class="c-item"><div class="ic">WEB</div><div><strong>Web</strong><span>cel-lab.in</span></div></div>
   </div>
-  <form class="cform" id="contactForm" method="POST" action="" novalidate>
+  <form class="cform" id="contactForm" method="POST" action="https://formspree.io/f/mwlleawn" novalidate>
     <h3>Send a message</h3>
     <p class="hint">We reply to most enquiries within a week.</p>
     <div class="frow">
@@ -55,7 +55,7 @@
 <script>
 (function(){
   var f=document.getElementById('contactForm'),st=document.getElementById('f-status'),btn=document.getElementById('f-send');
-  var endpoint='', to='aviral.marwal@hs.iitr.ac.in';
+  var endpoint='https://formspree.io/f/mwlleawn', to='aviral.marwal@hs.iitr.ac.in';
   f.addEventListener('submit',function(ev){
     ev.preventDefault();
     if(!f.checkValidity()){st.className='fmsg err';st.textContent='Please fill in your name, email and query.';return;}
