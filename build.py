@@ -581,12 +581,8 @@ def build_people():
     intern_block = f'<div class="eyebrow" style="margin:48px 0 14px">Research Interns</div><div class="grid people">{interns}</div>' if interns else ""
     current_theses = [t for t in THESES if not t["title"]]
     past_theses = [t for t in THESES if t["title"]]
-    ts = ""
-    for i, t in enumerate(current_theses):
-        ini = "".join(w[0] for w in t["name"].split()[:2]).upper()
-        ts += (f'<div class="person"><div class="avatar">{avatar_bg(30+i)}<span class="ini">{ini}</span></div><div class="person-body">'
-               f'<h3>{e(t["name"])}</h3><div class="role">Thesis student · {e(t["prog"])} · {e(t["year"])}</div><p>Thesis in progress</p></div></div>')
-    thesis_block = f'<div class="eyebrow" style="margin:48px 0 14px">Thesis Students</div><div class="grid people">{ts}</div>' if ts else ""
+    ts = "".join(f'<div class="talk"><div class="d">{e(t["prog"])} · {e(t["year"])}</div><div><div class="t">{e(t["name"])}</div><div class="v">Thesis in progress</div></div></div>' for t in current_theses)
+    thesis_block = f'<div class="eyebrow" style="margin:48px 0 6px">Thesis Students</div><div class="past">{ts}</div>' if ts else ""
     past = [{"name": a["name"], "d": a["role"], "v": a["affil"] + (f' · {a["topic"]}' if a.get("topic") else "")} for a in PEOPLE.get("alumni", [])]
     past += [{"name": t["name"], "d": f'Thesis student · {t["prog"]} · {t["year"]}', "v": t["title"]} for t in past_theses]
     alumni = "".join(f'<div class="talk"><div class="d">{e(a["d"])}</div><div><div class="t">{e(a["name"])}</div><div class="v">{e(a["v"])}</div></div></div>' for a in past)
