@@ -95,6 +95,47 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .proj p{font-size:15px;max-width:80ch}
 .proj .themes a{font-size:13px}
 
+/* projects: timeline + grouped grid */
+.tl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 26px 18px;overflow-x:auto;margin-bottom:48px}
+.tl-wrap svg{width:100%;min-width:640px;height:auto;display:block}
+.tl-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.tl-legend span{display:inline-flex;align-items:center;gap:6px}
+.tl-legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+.grid.projects{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.pcard{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 24px 20px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--navy)}
+.pcard .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pcard .meta b{color:var(--navy);font-weight:700}
+.pcard h3{font-size:20px}
+.pcard p{font-size:14.5px}
+.pcard .themes{margin-top:auto;padding-top:8px;font-size:13px;border-top:1px solid var(--line)}
+.pgroup{margin-bottom:44px}
+.pgroup h2{font-size:26px;margin-bottom:6px}
+.pgroup .sub{font-size:14px;color:var(--muted);margin-bottom:18px}
+
+/* blog */
+.post-list{display:grid;gap:0}
+.post-row{display:grid;grid-template-columns:130px 1fr;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}
+.post-row .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:6px}
+.post-row h3{font-size:24px;margin-bottom:6px}
+.post-row h3 a{color:var(--ink)}
+.post-row h3 a:hover{color:var(--teal)}
+.post-row p{font-size:15px}
+.post-row .by{font-size:13px;color:var(--muted);margin-top:6px}
+@media(max-width:520px){.post-row{grid-template-columns:1fr;gap:4px}}
+.post{max-width:70ch}
+.post .by{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+.post h2{font-size:28px;margin:36px 0 12px}
+.post h3{font-size:22px;margin:28px 0 10px}
+.post p,.post li{font-size:17px;line-height:1.75;margin-bottom:18px}
+.post ul,.post ol{padding-left:22px;margin-bottom:18px}
+.post li{margin-bottom:8px}
+.post blockquote{border-left:3px solid var(--amber);padding:4px 18px;color:var(--body);font-style:italic;margin:0 0 18px}
+.post img{border-radius:3px;margin:8px 0 18px}
+.post code{font-family:var(--mono);font-size:14px;background:var(--mist);padding:1px 5px;border-radius:2px}
+.post pre{background:var(--ink);color:#fff;padding:16px 18px;border-radius:3px;overflow-x:auto;margin-bottom:18px}
+.post pre code{background:none;color:inherit}
+.post-nav{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
 /* people */
 .pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
 .avatar{background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;aspect-ratio:1/1}

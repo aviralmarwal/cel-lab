@@ -140,7 +140,7 @@ THEMES = [
 PROJECTS = [
     {
         "title": "Assessment of Financial Resources of Local Self-Governing Institutions (PRIs and ULBs) in Uttarakhand",
-        "role": "Co-PI",
+        "role": "Co-PI", "status": "ongoing", "start": "2025-05", "end": "",
         "funder": "SETU Aayog, Government of Uttarakhand",
         "years": "2025 – present",
         "summary": (
@@ -152,7 +152,7 @@ PROJECTS = [
     },
     {
         "title": "Taxing Vacant Land: A Pan-India Panel Study of Property Tax Discounts and Urban Sprawl in Metropolitan and Tier-2 Cities",
-        "role": "PI",
+        "role": "PI", "status": "ongoing", "start": "", "end": "",  # dates to confirm
         "summary": (
             "Builds a multi-city, multi-year panel of property-tax rules and rates across Indian metropolitan and "
             "tier-2 cities to examine how concessions on vacant land affect land holding, development timing and "
@@ -162,7 +162,7 @@ PROJECTS = [
     },
     {
         "title": "Property Tax, Land Records and Urban Growth in Nagar Nigam Roorkee: A Plot-Level Assessment and Policy Options",
-        "role": "PI",
+        "role": "PI", "status": "ongoing", "start": "", "end": "",  # dates to confirm
         "summary": (
             "A plot-level study of Roorkee's property-tax register and land records, matched to GIS and satellite "
             "footprints, to estimate the gap between taxable and taxed property, trace how growth is occurring "
@@ -172,7 +172,7 @@ PROJECTS = [
     },
     {
         "title": "Population Synthesis for Disaggregated Travel Demand Modelling",
-        "role": "Co-PI",
+        "role": "Co-PI", "status": "ongoing", "start": "", "end": "",  # dates to confirm
         "summary": (
             "Builds a synthetic population of households and individuals for Bengaluru — matched to census "
             "marginals and survey microdata — as the foundation for disaggregated, activity-based travel demand "
@@ -184,7 +184,7 @@ PROJECTS = [
     },
     {
         "title": "Neighbourhood Accessibility and Gentrification",
-        "role": "PI",
+        "role": "PI", "status": "ongoing", "start": "2025-09", "end": "",
         "funder": "SRIC, IIT Roorkee",
         "years": "2025 – present",
         "summary": (
@@ -196,7 +196,7 @@ PROJECTS = [
     },
     {
         "title": "Mapping Opportunities for Healthy and Sustainable Urban Transitions in Post-Industrial Cities",
-        "role": "Collaborator",
+        "role": "Collaborator", "status": "collaboration", "start": "", "end": "",  # dates to confirm
         "partner": "Urban Studies Foundation, UK",
         "summary": (
             "A research collaboration with the Urban Studies Foundation on how post-industrial cities can steer "
@@ -291,6 +291,12 @@ THESES = [  # master's and BS-MS thesis supervision; title "" = ongoing
     {"name": "Madhav Mukund", "prog": "BS-MS Economics", "year": "2025 – 26", "title": "Analysing the impact of public investment on economic growth and equity"},
     {"name": "Vedant Dwivedi", "prog": "BS-MS Economics", "year": "2025 – 26", "title": "The role of informal institutions in shaping careers at IIT Roorkee and the determinants of entrepreneurship"},
 ]
+
+BLOG = {
+    "label": "Blog",
+    "intro": "Short pieces from the lab: notes on data, methods and policy debates on Indian cities, written by lab members.",
+    "dir": "posts",   # one Markdown file per post, with a header block (see posts/README.md)
+}
 
 OPPORTUNITIES = {
     "openings": [],  # e.g. {"title": "JRF, property tax and urban sprawl project", "note": "...", "deadline": "..."}

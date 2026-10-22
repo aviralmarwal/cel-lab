@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
-import os, shutil, html, math, random
-from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING, THESES
+import os, shutil, html, math, random, re, glob, datetime
+import markdown
+from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING, THESES, BLOG
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
 THEME_BY_SLUG = {t["slug"]: t for t in THEMES}
@@ -105,6 +106,47 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .proj h3{font-size:22px}
 .proj p{font-size:15px;max-width:80ch}
 .proj .themes a{font-size:13px}
+
+/* projects: timeline + grouped grid */
+.tl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 26px 18px;overflow-x:auto;margin-bottom:48px}
+.tl-wrap svg{width:100%;min-width:640px;height:auto;display:block}
+.tl-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.tl-legend span{display:inline-flex;align-items:center;gap:6px}
+.tl-legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+.grid.projects{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.pcard{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 24px 20px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--navy)}
+.pcard .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pcard .meta b{color:var(--navy);font-weight:700}
+.pcard h3{font-size:20px}
+.pcard p{font-size:14.5px}
+.pcard .themes{margin-top:auto;padding-top:8px;font-size:13px;border-top:1px solid var(--line)}
+.pgroup{margin-bottom:44px}
+.pgroup h2{font-size:26px;margin-bottom:6px}
+.pgroup .sub{font-size:14px;color:var(--muted);margin-bottom:18px}
+
+/* blog */
+.post-list{display:grid;gap:0}
+.post-row{display:grid;grid-template-columns:130px 1fr;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}
+.post-row .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:6px}
+.post-row h3{font-size:24px;margin-bottom:6px}
+.post-row h3 a{color:var(--ink)}
+.post-row h3 a:hover{color:var(--teal)}
+.post-row p{font-size:15px}
+.post-row .by{font-size:13px;color:var(--muted);margin-top:6px}
+@media(max-width:520px){.post-row{grid-template-columns:1fr;gap:4px}}
+.post{max-width:70ch}
+.post .by{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+.post h2{font-size:28px;margin:36px 0 12px}
+.post h3{font-size:22px;margin:28px 0 10px}
+.post p,.post li{font-size:17px;line-height:1.75;margin-bottom:18px}
+.post ul,.post ol{padding-left:22px;margin-bottom:18px}
+.post li{margin-bottom:8px}
+.post blockquote{border-left:3px solid var(--amber);padding:4px 18px;color:var(--body);font-style:italic;margin:0 0 18px}
+.post img{border-radius:3px;margin:8px 0 18px}
+.post code{font-family:var(--mono);font-size:14px;background:var(--mist);padding:1px 5px;border-radius:2px}
+.post pre{background:var(--ink);color:#fff;padding:16px 18px;border-radius:3px;overflow-x:auto;margin-bottom:18px}
+.post pre code{background:none;color:inherit}
+.post-nav{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 
 /* people */
 .pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
@@ -386,7 +428,7 @@ def avatar_bg(seed):
 # ───────────────────────── Templates ─────────────────────────
 NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", "Projects"),
        ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News & Talks"),
-       ("teaching.html", "Teaching"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
+       ("teaching.html", "Teaching"), ("blog.html", "Blog"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
 
 def page(title, body, active, depth=0, desc=None):
     root = "../" * depth
@@ -468,7 +510,7 @@ def event_html(ev, root=""):
 # ───────────────────────── Pages ─────────────────────────
 def build_index():
     themes = "".join(theme_card(t) for t in THEMES)
-    projects = "".join(project_html(p) for p in PROJECTS)
+    projects = "".join(pcard(p) for p in PROJECTS[:4])
     recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
     news = "".join(f'<div class="news"><div class="kind">{e(n["date_text"])}</div><p style="font-size:15px;color:var(--ink)">{e(n["text"])}</p>'
                    f'<p style="margin-top:8px"><a href="{n["link"]}" class="eyebrow">Read more →</a></p></div>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
@@ -490,7 +532,7 @@ def build_index():
 
 <section class="block alt"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Projects</div><h2>Current projects</h2></div><a class="more" href="projects.html">Project details →</a></div>
-  <div class="proj-list">{projects}</div>
+  <div class="grid projects">{projects}</div>
 </div></section>
 
 <section class="block"><div class="wrap">
@@ -552,14 +594,72 @@ def build_theme(t):
 """
     return page(t["title"], body, "research.html", depth=1, desc=t["short"])
 
+THEME_COLORS = {"urban-growth-simulation": "#1a3a5c", "facility-mapping-accessibility": "#0e7c7b",
+                "commuting-built-environment-typologies": "#4a90c4", "housing-affordability-segregation": "#d9901a",
+                "industrial-agglomeration-growth": "#9b8ea0", "land-use-optimisation": "#5a9e6f",
+                "municipal-finance-property-tax": "#b5541c"}
+
+def ym(s):
+    y, m = s.split("-"); return int(y) + (int(m) - 1) / 12
+
+def project_timeline(projects):
+    dated = [p for p in projects if p.get("start")]
+    if not dated: return ""
+    today = datetime.date.today(); now = today.year + (today.month - 1) / 12
+    y0 = int(min(ym(p["start"]) for p in dated)); y1 = int(max([ym(p["end"]) if p.get("end") else now for p in dated])) + 1
+    left, right, top, rowh = 300, 20, 34, 34
+    W = 1100; H = top + rowh * len(dated) + 14
+    def X(v): return left + (v - y0) / (y1 - y0) * (W - left - right)
+    s = []
+    for y in range(y0, y1 + 1):
+        x = X(y)
+        s.append(f'<line x1="{x:.1f}" y1="{top-10}" x2="{x:.1f}" y2="{H-10}" stroke="{PAL["mist"]}" stroke-width="1"/>')
+        if y < y1: s.append(f'<text x="{X(y+.5):.1f}" y="18" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" fill="{PAL["i"]}">{y}</text>')
+    xn = X(now)
+    s.append(f'<line x1="{xn:.1f}" y1="{top-10}" x2="{xn:.1f}" y2="{H-10}" stroke="{PAL["amber"]}" stroke-width="1.5" stroke-dasharray="3 3"/>')
+    s.append(f'<text x="{xn+4:.1f}" y="{H-2}" font-family="Space Mono,monospace" font-size="9" fill="{PAL["amber"]}">TODAY</text>')
+    for i, p in enumerate(sorted(dated, key=lambda p: p["start"])):
+        y = top + i * rowh
+        xs = X(ym(p["start"])); xe = X(ym(p["end"])) if p.get("end") else xn
+        col = THEME_COLORS.get(p["themes"][0], PAL["navy"])
+        title = p["title"]; short = title if len(title) <= 46 else title[:44].rsplit(" ", 1)[0] + "…"
+        s.append(f'<text x="{left-12}" y="{y+16}" text-anchor="end" font-family="Outfit,sans-serif" font-size="13" fill="{PAL["navy"]}">{e(short)}</text>')
+        s.append(f'<rect x="{xs:.1f}" y="{y+4}" width="{max(xe-xs,6):.1f}" height="18" rx="2" fill="{col}" opacity=".9"/>')
+        if not p.get("end"):
+            s.append(f'<rect x="{xe-6:.1f}" y="{y+4}" width="6" height="18" fill="{PAL["cream"]}" opacity=".55"/>')
+        s.append(f'<text x="{xs+6:.1f}" y="{y+17}" font-family="Space Mono,monospace" font-size="9.5" fill="#fff">{e(p["role"])}</text>')
+    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="Project timeline">{"".join(s)}</svg>'
+    used = []
+    for p in dated:
+        t = p["themes"][0]
+        if t not in used: used.append(t)
+    legend = "".join(f'<span><i style="background:{THEME_COLORS[t]}"></i>{e(THEME_BY_SLUG[t]["title"])}</span>' for t in used)
+    return f'<div class="tl-wrap">{svg}<div class="tl-legend">{legend}<span><i style="background:transparent;border:1.5px dashed {PAL["amber"]}"></i>Today · faded end = ongoing</span></div></div>'
+
+def pcard(p, root=""):
+    yrs = p.get("years") or ((p["start"][:4] + " – " + (p["end"][:4] if p.get("end") else "present")) if p.get("start") else "")
+    meta = " · ".join(x for x in [f'<b>{e(p["role"])}</b>' if p.get("role") else "", e(yrs), e(p.get("funder", "")), (f'with {e(p["partner"])}' if p.get("partner") else "")] if x)
+    th = ", ".join(f'<a href="{root}research/{s}.html">{e(THEME_BY_SLUG[s]["title"])}</a>' for s in p["themes"])
+    col = THEME_COLORS.get(p["themes"][0], PAL["navy"])
+    return (f'<article class="pcard" style="border-top-color:{col}"><div class="meta">{meta}</div><h3>{e(p["title"])}</h3>'
+            f'<p>{e(p["summary"])}</p><div class="themes muted">Theme: {th}</div></article>')
+
 def build_projects():
-    projects = "".join(project_html(p) for p in PROJECTS)
+    groups = [("ongoing", "Ongoing projects", "Funded research led or co-led by the lab."),
+              ("collaboration", "Collaborations", "Joint work with partner institutions."),
+              ("completed", "Completed projects", "")]
+    blocks = ""
+    for key, title, sub in groups:
+        ps = [p for p in PROJECTS if p.get("status", "ongoing") == key]
+        if not ps: continue
+        blocks += (f'<div class="pgroup"><h2>{title}</h2>' + (f'<p class="sub">{sub}</p>' if sub else "") +
+                   f'<div class="grid projects">{"".join(pcard(p) for p in ps)}</div></div>')
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Projects</div><h1>Funded and partnered research</h1>
-  <p>Projects led or co-led by CEL Lab, working with state and city governments on evidence they can act on.</p>
+  <p>Projects led or co-led by CEL Lab, working with state and city governments and partner institutions on evidence they can act on.</p>
 </div></div></section>
-<section class="block"><div class="wrap"><div class="proj-list">{projects}</div></div></section>
+<section class="block"><div class="wrap">{project_timeline(PROJECTS)}{blocks}</div></section>
 """
     return page("Projects", body, "projects.html")
 
@@ -646,6 +746,44 @@ def talk_html(t, root=""):
     return (f'<div class="talk"><div class="d">{e(t["date_text"])}</div><div><div class="k">{e(t["kind"])}</div>'
             f'<div class="t">{e(t["title"])}</div><div class="v">{e(t["venue"])}</div></div></div>')
 
+def load_posts():
+    posts = []
+    for f in sorted(glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), BLOG["dir"], "*.md"))):
+        if os.path.basename(f).lower() == "readme.md": continue
+        txt = open(f, encoding="utf-8").read()
+        m = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", txt, re.S)
+        if not m: continue
+        meta = dict((k.strip(), v.strip()) for k, v in (ln.split(":", 1) for ln in m.group(1).splitlines() if ":" in ln))
+        slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", os.path.splitext(os.path.basename(f))[0])
+        posts.append({"slug": slug, "title": meta.get("title", slug), "date": meta.get("date", ""), "author": meta.get("author", ""),
+                      "summary": meta.get("summary", ""), "html": markdown.markdown(m.group(2), extensions=["extra", "smarty"])})
+    return sorted(posts, key=lambda p: p["date"], reverse=True)
+
+def nice_date(s):
+    try: return datetime.date.fromisoformat(s).strftime("%-d %B %Y")
+    except Exception: return s
+
+def build_blog(posts):
+    rows = "".join(f'<div class="post-row"><div class="d">{e(nice_date(p["date"]))}</div><div><h3><a href="blog/{p["slug"]}.html">{e(p["title"])}</a></h3>'
+                   f'<p>{e(p["summary"])}</p><div class="by">{e(p["author"])}</div></div></div>' for p in posts) or '<p class="muted">No posts yet.</p>'
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">{e(BLOG["label"])}</div><h1>Notes from the lab</h1><p>{e(BLOG["intro"])}</p>
+</div></div></section>
+<section class="block"><div class="wrap"><div class="post-list">{rows}</div></div></section>
+"""
+    return page(BLOG["label"], body, "blog.html")
+
+def build_post(p):
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow"><a href="../blog.html">{e(BLOG["label"])}</a></div><h1>{e(p["title"])}</h1>
+</div></div></section>
+<section class="block"><div class="wrap"><article class="post"><div class="by">{e(p["author"])} · {e(nice_date(p["date"]))}</div>{p["html"]}
+<div class="post-nav"><a href="../blog.html">← All posts</a></div></article></div></section>
+"""
+    return page(p["title"], body, "blog.html", depth=1, desc=p["summary"])
+
 def build_events():
     items = "".join(event_html(ev) for ev in EVENTS_SORTED)
     news = "".join(f'<li><span class="d">{e(n["date_text"])}</span>{e(n["text"])}</li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True))
@@ -704,7 +842,7 @@ FAVICON = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect wi
 
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
-    os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research"))
+    os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research")); os.makedirs(os.path.join(OUT, "blog"))
     w = lambda rel, s: open(os.path.join(OUT, rel), "w", encoding="utf-8").write(s)
     w("assets/style.css", CSS.strip() + "\n")
     w("assets/favicon.svg", FAVICON)
@@ -715,6 +853,8 @@ def main():
     if os.path.isdir(src_assets):
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
     for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
+    posts = load_posts(); w("blog.html", build_blog(posts))
+    for p in posts: w(f"blog/{p['slug']}.html", build_post(p))
     if LAB.get("cname_live"): w("CNAME", LAB["domain"] + "\n")  # only once DNS for the domain points at GitHub
     print("built", sum(len(f) for _, _, f in os.walk(OUT)), "files in", OUT)
 
