@@ -581,7 +581,8 @@ def build_people():
     alumni = "".join(f'<div class="talk"><div class="d">{e(a["role"])}</div><div><div class="t">{e(a["name"])}</div>'
                      f'<div class="v">{e(a["affil"])}' + (f' · {e(a["topic"])}' if a.get("topic") else "") + '</div></div></div>'
                      for a in PEOPLE.get("alumni", []))
-    alumni_block = f'<div class="eyebrow" style="margin:48px 0 6px">Past members and interns</div><div>{alumni}</div>' if alumni else ""
+    alumni_block = (f'<div class="eyebrow" style="margin:48px 0 6px">Past members and interns</div>'
+                    f'<p class="muted" style="font-size:14px;margin-bottom:6px">Summer interns hosted under the SPARK programme, IIT Roorkee.</p><div>{alumni}</div>') if alumni else ""
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">People</div><h1>The team</h1>

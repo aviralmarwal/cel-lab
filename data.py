@@ -314,8 +314,8 @@ PEOPLE = {
         {"name": "Shraman Joardar", "initials": "SJ", "role": "Research Intern (since Feb 2026)", "topic": "City-scale slum formation using agent-based modelling", "photo": None},
     ],
     "alumni": [  # past interns and members, newest first
-        {"name": "Adarsh Singh", "affil": "B.Tech, NIT Delhi", "role": "Research Intern, May – July 2026", "topic": "Building the property tax database for cities in India"},
-        {"name": "Anisha Kathpal", "affil": "PhD scholar, IIT Kanpur", "role": "Research Intern, May – July 2025", "topic": "Systematic literature review of state-led gentrification in the Global South"},
+        {"name": "Adarsh Singh", "affil": "B.Tech, NIT Delhi", "role": "SPARK Intern, May – July 2026", "topic": "Building the property tax database for cities in India"},
+        {"name": "Anisha Kathpal", "affil": "PhD scholar, IIT Kanpur", "role": "SPARK Intern, May – July 2025", "topic": "Systematic literature review of state-led gentrification in the Global South"},
     ],
 }
 
