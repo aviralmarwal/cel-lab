@@ -32,7 +32,7 @@
     <div class="c-item"><div class="ic">LOC</div><div><strong>Address</strong><span>Department of Humanities &amp; Social Sciences, Indian Institute of Technology Roorkee, Roorkee 247667, Uttarakhand, India</span></div></div>
     <div class="c-item"><div class="ic">WEB</div><div><strong>Web</strong><span>cel-lab.in</span></div></div>
   </div>
-  <form class="cform" id="contactForm" method="POST" action="" novalidate>
+  <form class="cform" id="contactForm" method="POST" action="https://api.web3forms.com/submit" novalidate>
     <h3>Send a message</h3>
     <p class="hint">We reply to most enquiries within a week.</p>
     <div class="frow">
@@ -47,7 +47,7 @@
         </select></div>
     </div>
     <div class="fg"><label for="f-msg">Your query</label><textarea id="f-msg" name="message" required></textarea></div>
-    
+    <input type="hidden" name="access_key" value="fce0812b-949e-4f23-8aa5-bb751459a329">
     <input type="hidden" name="subject" value="New enquiry via cel-lab.in contact form">
     <input type="hidden" name="from_name" value="CEL Lab website">
     <input type="checkbox" class="hp" name="botcheck" tabindex="-1" autocomplete="off">
@@ -58,7 +58,7 @@
 <script>
 (function(){
   var f=document.getElementById('contactForm'),st=document.getElementById('f-status'),btn=document.getElementById('f-send');
-  var endpoint='', to='aviral.marwal@hs.iitr.ac.in';
+  var endpoint='https://api.web3forms.com/submit', to='aviral.marwal@hs.iitr.ac.in';
   f.addEventListener('submit',function(ev){
     ev.preventDefault();
     if(!f.checkValidity()){st.className='fmsg err';st.textContent='Please fill in your name, email and query.';return;}

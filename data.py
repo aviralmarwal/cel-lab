@@ -10,7 +10,7 @@ LAB = {
     "domain": "cel-lab.in",
     "cname_live": False,
     "form_endpoint": "https://api.web3forms.com/submit",  # form backend; empty = email-client fallback
-    "form_access_key": "",   # Web3Forms access key (from web3forms.com)
+    "form_access_key": "fce0812b-949e-4f23-8aa5-bb751459a329",   # Web3Forms access key (from web3forms.com)
     "description": (
         "CEL Lab is an urban economics and policy research group at IIT Roorkee. "
         "We treat cities as places to experiment and learn: building empirical evidence on "
