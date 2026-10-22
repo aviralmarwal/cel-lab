@@ -185,7 +185,8 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .talk .t{font-family:var(--serif);font-size:18px;color:var(--ink);line-height:1.35}
 .talk .v{font-size:14px;color:var(--body);margin-top:3px}
 .talk .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:4px}
-@media(max-width:520px){.talk{grid-template-columns:1fr;gap:4px}}
+.past .talk{grid-template-columns:200px 1fr}
+@media(max-width:520px){.talk,.past .talk{grid-template-columns:1fr;gap:4px}}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
 @media(max-width:820px){.two-col{grid-template-columns:1fr}}
 .subhead{font-size:26px;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--navy)}
@@ -578,11 +579,19 @@ def build_people():
         topic = f'<p>{e(s["topic"])}</p>' if s.get("topic") else ""
         interns += f'<div class="person"><div class="avatar">{sav}</div><div class="person-body"><h3>{e(s["name"])}</h3><div class="role">{e(s["role"])}</div>{topic}</div></div>'
     intern_block = f'<div class="eyebrow" style="margin:48px 0 14px">Research Interns</div><div class="grid people">{interns}</div>' if interns else ""
-    alumni = "".join(f'<div class="talk"><div class="d">{e(a["role"])}</div><div><div class="t">{e(a["name"])}</div>'
-                     f'<div class="v">{e(a["affil"])}' + (f' · {e(a["topic"])}' if a.get("topic") else "") + '</div></div></div>'
-                     for a in PEOPLE.get("alumni", []))
-    alumni_block = (f'<div class="eyebrow" style="margin:48px 0 6px">Past members and interns</div>'
-                    f'<p class="muted" style="font-size:14px;margin-bottom:6px">Summer interns hosted under the SPARK programme, IIT Roorkee.</p><div>{alumni}</div>') if alumni else ""
+    current_theses = [t for t in THESES if not t["title"]]
+    past_theses = [t for t in THESES if t["title"]]
+    ts = ""
+    for i, t in enumerate(current_theses):
+        ini = "".join(w[0] for w in t["name"].split()[:2]).upper()
+        ts += (f'<div class="person"><div class="avatar">{avatar_bg(30+i)}<span class="ini">{ini}</span></div><div class="person-body">'
+               f'<h3>{e(t["name"])}</h3><div class="role">Thesis student · {e(t["prog"])} · {e(t["year"])}</div><p>Thesis in progress</p></div></div>')
+    thesis_block = f'<div class="eyebrow" style="margin:48px 0 14px">Thesis Students</div><div class="grid people">{ts}</div>' if ts else ""
+    past = [{"name": a["name"], "d": a["role"], "v": a["affil"] + (f' · {a["topic"]}' if a.get("topic") else "")} for a in PEOPLE.get("alumni", [])]
+    past += [{"name": t["name"], "d": f'Thesis student · {t["prog"]} · {t["year"]}', "v": t["title"]} for t in past_theses]
+    alumni = "".join(f'<div class="talk"><div class="d">{e(a["d"])}</div><div><div class="t">{e(a["name"])}</div><div class="v">{e(a["v"])}</div></div></div>' for a in past)
+    alumni_block = (f'<div class="eyebrow" style="margin:48px 0 6px">Past Team Members</div>'
+                    f'<p class="muted" style="font-size:14px;margin-bottom:6px">Interns hosted under the SPARK programme, IIT Roorkee, and M.Sc. / BS-MS Economics thesis students supervised at the lab.</p><div class="past">{alumni}</div>') if alumni else ""
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">People</div><h1>The team</h1>
@@ -597,6 +606,7 @@ def build_people():
   <div class="eyebrow" style="margin-bottom:14px">Research Scholars</div>
   <div class="grid people">{scholars}</div>
   {intern_block}
+  {thesis_block}
   {alumni_block}
 </div></section>
 """
@@ -666,19 +676,12 @@ def build_events():
 def build_teaching():
     courses = "".join(f'<div class="course"><div class="code">{e(c["code"])}<small>{e(c["term"])} · {e(c["level"])}</small></div>'
                       f'<div><h3>{e(c["title"])}</h3><p>{e(c["desc"])}</p></div></div>' for c in TEACHING)
-    theses = "".join(f'<div class="talk"><div class="d">{e(t["year"])}</div><div><div class="t">{e(t["name"])} <span class="muted" style="font-family:var(--sans);font-size:14px">· {e(t["prog"])}</span></div>'
-                     f'<div class="v">{e(t["title"]) if t["title"] else "<em>Thesis in progress</em>"}</div></div></div>' for t in THESES)
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Teaching</div><h1>Courses at IIT Roorkee</h1>
-  <p>Courses taught by lab members in the Department of Humanities &amp; Social Sciences. Students interested in a dissertation or project in urban economics are welcome to get in touch.</p>
+  <p>Courses taught by lab members in the Department of Humanities &amp; Social Sciences. Students interested in a thesis or project in urban economics are welcome to get in touch; current and past thesis students are listed on the <a href="people.html">People</a> page.</p>
 </div></div></section>
 <section class="block"><div class="wrap"><div class="proj-list">{courses}</div></div></section>
-<section class="block alt"><div class="wrap">
-  <h2 class="subhead">Thesis supervision</h2>
-  <p class="muted" style="font-size:14px;margin-bottom:18px">Master's and BS-MS Economics theses supervised at IIT Roorkee. Doctoral supervision is listed on the <a href="people.html">People</a> page.</p>
-  {theses}
-</div></section>
 """
     return page("Teaching", body, "teaching.html")
 
