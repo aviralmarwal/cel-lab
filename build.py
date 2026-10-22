@@ -572,6 +572,16 @@ def build_people():
         sav = f'<img src="{s["photo"]}" alt="{e(s["name"])}">' if s["photo"] else f'{avatar_bg(10+i)}<span class="ini">{s["initials"]}</span>'
         topic = f'<p>{e(s["topic"])}</p>' if s["topic"] else ""
         scholars += f'<div class="person"><div class="avatar">{sav}</div><div class="person-body"><h3>{e(s["name"])}</h3><div class="role">{e(s["role"])}</div>{topic}</div></div>'
+    interns = ""
+    for i, s in enumerate(PEOPLE.get("interns", [])):
+        sav = f'<img src="{s["photo"]}" alt="{e(s["name"])}">' if s.get("photo") else f'{avatar_bg(20+i)}<span class="ini">{s["initials"]}</span>'
+        topic = f'<p>{e(s["topic"])}</p>' if s.get("topic") else ""
+        interns += f'<div class="person"><div class="avatar">{sav}</div><div class="person-body"><h3>{e(s["name"])}</h3><div class="role">{e(s["role"])}</div>{topic}</div></div>'
+    intern_block = f'<div class="eyebrow" style="margin:48px 0 14px">Research Interns</div><div class="grid people">{interns}</div>' if interns else ""
+    alumni = "".join(f'<div class="talk"><div class="d">{e(a["role"])}</div><div><div class="t">{e(a["name"])}</div>'
+                     f'<div class="v">{e(a["affil"])}' + (f' · {e(a["topic"])}' if a.get("topic") else "") + '</div></div></div>'
+                     for a in PEOPLE.get("alumni", []))
+    alumni_block = f'<div class="eyebrow" style="margin:48px 0 6px">Past members and interns</div><div>{alumni}</div>' if alumni else ""
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">People</div><h1>The team</h1>
@@ -585,6 +595,8 @@ def build_people():
   </div></div>
   <div class="eyebrow" style="margin-bottom:14px">Research Scholars</div>
   <div class="grid people">{scholars}</div>
+  {intern_block}
+  {alumni_block}
 </div></section>
 """
     return page("People", body, "people.html")
