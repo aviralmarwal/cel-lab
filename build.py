@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
 import os, shutil, html, math, random
-from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES
+from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
 THEME_BY_SLUG = {t["slug"]: t for t in THEMES}
@@ -174,6 +174,21 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .news .kind{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
 .news h3{font-size:19px;margin:6px 0}
 .news p{font-size:14px}
+
+/* timeline + talks */
+.timeline{list-style:none;display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.timeline li{position:relative;padding:0 0 22px 26px;font-size:15px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--amber);border:2px solid var(--cream)}
+.timeline .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
+.talk{display:grid;grid-template-columns:110px 1fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+.talk .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+.talk .t{font-family:var(--serif);font-size:18px;color:var(--ink);line-height:1.35}
+.talk .v{font-size:14px;color:var(--body);margin-top:3px}
+.talk .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:4px}
+@media(max-width:520px){.talk{grid-template-columns:1fr;gap:4px}}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+@media(max-width:820px){.two-col{grid-template-columns:1fr}}
+.subhead{font-size:26px;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--navy)}
 
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
@@ -361,7 +376,7 @@ def avatar_bg(seed):
 
 # ───────────────────────── Templates ─────────────────────────
 NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", "Projects"),
-       ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "Events"),
+       ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News & Talks"),
        ("opportunities.html", "Join us"), ("contact.html", "Contact")]
 
 def page(title, body, active, depth=0, desc=None):
@@ -444,8 +459,8 @@ def build_index():
     themes = "".join(theme_card(t) for t in THEMES)
     projects = "".join(project_html(p) for p in PROJECTS)
     recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
-    news = "".join(f'<div class="news"><div class="kind">{e(ev["kind"])} · {e(ev["date_text"])}</div><h3><a href="events.html">{e(ev["title"])}</a></h3>'
-                   f'<p>{e(", ".join(s["name"] for s in ev.get("speakers", [])))}</p></div>' for ev in EVENTS_SORTED[:3])
+    news = "".join(f'<div class="news"><div class="kind">{e(n["date_text"])}</div><p style="font-size:15px;color:var(--ink)">{e(n["text"])}</p>'
+                   f'<p style="margin-top:8px"><a href="{n["link"]}" class="eyebrow">Read more →</a></p></div>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
     body = f"""
 <section class="hero"><div class="wrap">
   <div>
@@ -473,7 +488,7 @@ def build_index():
 </div></section>
 
 <section class="block alt"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Events &amp; news</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All events →</a></div>
+  <div class="sec-head"><div><div class="eyebrow">News</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All news &amp; talks →</a></div>
   <div class="news-strip">{news}</div>
 </div></section>
 """
@@ -494,6 +509,8 @@ def build_theme(t):
     pubs = [p for p in ALL_PUBS if t["slug"] in p["themes"]]
     projs = [p for p in PROJECTS if t["slug"] in p["themes"]]
     issues = "".join(f"<li>{e(i)}</li>" for i in t["issues"])
+    talks = [tk for tk in TALKS if t["slug"] in tk.get("themes", [])]
+    talk_side = ('<div class="side"><h3>Talks</h3><ul>' + "".join(f'<li><a href="../events.html">{e(tk["title"])}</a> <span class="muted">({e(tk["venue"].split(",")[0])}, {e(tk["date_text"])})</span></li>' for tk in talks) + "</ul></div>") if talks else ""
     pub_block = "".join(pub_html(p, "../", compact=True) for p in pubs) or '<p class="empty">No publications under this theme yet.</p>'
     ongoing = [o for o in ONGOING if o["theme"] == t["slug"]]
     ongoing_block = ""
@@ -517,6 +534,7 @@ def build_theme(t):
   <aside class="min">
     <div class="side"><h3>Related projects</h3>{proj_block}</div>
     <div class="side"><h3>Related publications</h3>{pub_block}</div>
+    {talk_side}
     <div class="side"><h3>People</h3><ul><li><a href="../people.html">{e(PEOPLE["pi"]["name"])}</a> <span class="muted">(PI)</span></li></ul></div>
   </aside>
 </div></section>
@@ -595,16 +613,32 @@ def build_contact():
 """
     return page("Contact", body, "contact.html")
 
+def talk_html(t, root=""):
+    return (f'<div class="talk"><div class="d">{e(t["date_text"])}</div><div><div class="k">{e(t["kind"])}</div>'
+            f'<div class="t">{e(t["title"])}</div><div class="v">{e(t["venue"])}</div></div></div>')
+
 def build_events():
-    items = "".join(event_html(ev) for ev in EVENTS_SORTED) or '<p class="muted">No events listed yet.</p>'
+    items = "".join(event_html(ev) for ev in EVENTS_SORTED)
+    news = "".join(f'<li><span class="d">{e(n["date_text"])}</span>{e(n["text"])}</li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True))
+    talks = "".join(talk_html(t) for t in sorted(TALKS, key=lambda t: t["date"], reverse=True))
+    confs = "".join(f'<div class="talk"><div class="d">{e(c["date_text"])}</div><div><div class="t">{e(c["title"])}</div>'
+                    f'<div class="v">{e(c["venue"])}{(" · " + e(c["note"])) if c.get("note") else ""}</div></div></div>'
+                    for c in sorted(CONFERENCES, key=lambda c: c["date"], reverse=True))
     body = f"""
 <section class="page-head"><div class="wrap"><div>
-  <div class="eyebrow">Events &amp; news</div><h1>Seminars, talks and news</h1>
-  <p>Events organised by CEL Lab, invited talks, and other news from the group.</p>
+  <div class="eyebrow">News &amp; talks</div><h1>News, seminars and talks</h1>
+  <p>What the lab has been doing: events we have organised, papers presented and invited talks, and conferences attended.</p>
 </div></div></section>
-<section class="block"><div class="wrap">{items}</div></section>
+<section class="block"><div class="wrap">
+  <h2 class="subhead">Events organised</h2>{items}
+</div></section>
+<section class="block alt"><div class="wrap two-col">
+  <div class="min"><h2 class="subhead">Papers presented and invited talks</h2>{talks}
+    <h2 class="subhead" style="margin-top:40px">Conferences attended</h2>{confs}</div>
+  <div class="min"><h2 class="subhead">News</h2><ul class="timeline">{news}</ul></div>
+</div></section>
 """
-    return page("Events & News", body, "events.html")
+    return page("News & Talks", body, "events.html")
 
 def build_opportunities():
     ops = OPPORTUNITIES["openings"]

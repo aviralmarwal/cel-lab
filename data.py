@@ -209,6 +209,42 @@ EVENTS = [
     },
 ]
 
+TALKS = [  # papers presented and invited talks, newest first
+    {"date": "2024-04", "date_text": "April 2024", "kind": "Invited lecture",
+     "title": "Gentrification and housing affordability", "venue": "O. P. Jindal Global University",
+     "themes": ["housing-affordability-segregation"]},
+    {"date": "2023-10", "date_text": "October 2023", "kind": "Invited talk",
+     "title": "An analytical framework to study urbanisation using spatial data", "venue": "CiSTUP, Indian Institute of Science, Bengaluru",
+     "themes": ["urban-growth-simulation"]},
+    {"date": "2023-09", "date_text": "September 2023", "kind": "Invited talk",
+     "title": "Building geospatial data from satellite imagery to study urban form", "venue": "Urban Big Data Centre, University of Glasgow",
+     "themes": ["commuting-built-environment-typologies"]},
+    {"date": "2023-08", "date_text": "August 2023", "kind": "Paper presented",
+     "title": "Utilizing ABM and neural network models to simulate built-up expansion in Delhi",
+     "venue": "International Association for Mathematical Geosciences (IAMG) conference, NTNU Trondheim, Norway",
+     "themes": ["urban-growth-simulation"]},
+    {"date": "2023-07", "date_text": "July 2023", "kind": "Paper presented",
+     "title": "A study of the commuting pattern of households in Delhi",
+     "venue": "Regional Science Association International (RSAI) conference, University of Newcastle, UK",
+     "themes": ["commuting-built-environment-typologies"]},
+]
+
+CONFERENCES = [  # conferences attended, newest first
+    {"date": "2026-06", "date_text": "14–18 June 2026", "title": "RSA Annual Conference: Regions as Arenas in a Changing World", "venue": "Sweden", "note": "Funded by IIT Roorkee"},
+    {"date": "2025-12", "date_text": "23–25 December 2025", "title": "Conference on Cities and Urban Planning in Ancient India", "venue": "IIT Indore", "note": ""},
+    {"date": "2023-08", "date_text": "1–4 August 2023", "title": "IAMG Conference", "venue": "NTNU Trondheim, Norway", "note": "Funded by the University of Cambridge"},
+]
+
+NEWS = [  # short dated items for the timeline and the home-page strip, newest first
+    {"date": "2026-06", "date_text": "June 2026", "text": "Aviral attends the RSA Annual Conference in Sweden, funded by IIT Roorkee.", "link": "events.html"},
+    {"date": "2025-12", "date_text": "December 2025", "text": "CEL Lab hosts the seminar \u201cMapping New Directions in Urbanisation\u201d with Arup Mitra (SAU) and Prafulla Parlewar (SPA Delhi), supported by the Urban Studies Foundation.", "link": "events.html"},
+    {"date": "2025-12", "date_text": "December 2025", "text": "Participation in the Conference on Cities and Urban Planning in Ancient India, IIT Indore.", "link": "events.html"},
+    {"date": "2025-07", "date_text": "July 2025", "text": "Ankita Dey joins the lab as a PhD scholar, working on urban land use policy.", "link": "people.html"},
+    {"date": "2025-05", "date_text": "May 2025", "text": "Work begins on the assessment of financial resources of PRIs and ULBs in Uttarakhand.", "link": "projects.html"},
+    {"date": "2025-01", "date_text": "January 2025", "text": "Nikhil Mishra joins the lab as a PhD scholar, working on firm agglomeration and urbanisation.", "link": "people.html"},
+    {"date": "2024-11", "date_text": "November 2024", "text": "CEL Lab is set up at the Department of Humanities & Social Sciences, IIT Roorkee.", "link": "index.html"},
+]
+
 OPPORTUNITIES = {
     "openings": [],  # e.g. {"title": "JRF, property tax and urban sprawl project", "note": "...", "deadline": "..."}
     "standing": (
