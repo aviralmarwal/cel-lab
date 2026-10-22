@@ -264,6 +264,21 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .note p{font-size:15px}
 @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
 
+/* contact form */
+.cform{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:30px 32px}
+.cform h3{font-size:22px;margin-bottom:6px}
+.cform .hint{font-size:14px;color:var(--muted);margin-bottom:20px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);font-family:var(--sans);font-size:15px;color:var(--ink);outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--teal)}
+.fg textarea{min-height:140px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.frow{grid-template-columns:1fr}}
+.fmsg{font-size:14px;margin-top:12px}
+.fmsg.ok{color:var(--teal)}.fmsg.err{color:#b5541c}
+.hp{position:absolute;left:-9999px}
+
 /* footer */
 footer{background:var(--ink);color:rgba(255,255,255,.55);padding-block:36px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
@@ -724,6 +739,7 @@ def build_publications():
 
 def build_contact():
     email = f'<span>{e(LAB["email"])}</span>' if LAB["email"] else '<span class="placeholder">Email address to be added</span>'
+    endpoint = LAB.get("form_endpoint", "")
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Contact</div><h1>Get in touch</h1>
@@ -735,10 +751,49 @@ def build_contact():
     <div class="c-item"><div class="ic">LOC</div><div><strong>Address</strong><span>{e(LAB["address"])}</span></div></div>
     <div class="c-item"><div class="ic">WEB</div><div><strong>Web</strong><span>{LAB["domain"]}</span></div></div>
   </div>
-  <div class="note"><h3>Join the lab</h3>
-    <p>We welcome enquiries from prospective PhD students and interns with a background in economics, planning, geography or data science, and from municipal and state agencies interested in collaborative, evidence-based projects. Write to us with a short note on your interests.</p>
-  </div>
+  <form class="cform" id="contactForm" method="POST" action="{endpoint}" novalidate>
+    <h3>Send a message</h3>
+    <p class="hint">We reply to most enquiries within a week.</p>
+    <div class="frow">
+      <div class="fg"><label for="f-name">Name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+      <div class="fg"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label for="f-org">Organisation (optional)</label><input id="f-org" name="organisation" type="text" autocomplete="organization"></div>
+      <div class="fg"><label for="f-type">Enquiry type</label>
+        <select id="f-type" name="enquiry_type">
+          <option>Research collaboration</option><option>PhD / internship enquiry</option><option>Government / municipal request</option><option>Media</option><option>Other</option>
+        </select></div>
+    </div>
+    <div class="fg"><label for="f-msg">Your query</label><textarea id="f-msg" name="message" required></textarea></div>
+    <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    <button class="btn primary" type="submit" id="f-send">Send message</button>
+    <div class="fmsg" id="f-status" aria-live="polite"></div>
+  </form>
 </div></section>
+<script>
+(function(){{
+  var f=document.getElementById('contactForm'),st=document.getElementById('f-status'),btn=document.getElementById('f-send');
+  var endpoint={endpoint!r}, to={LAB["email"]!r};
+  f.addEventListener('submit',function(ev){{
+    ev.preventDefault();
+    if(!f.checkValidity()){{st.className='fmsg err';st.textContent='Please fill in your name, email and query.';return;}}
+    var d=new FormData(f);
+    if(!endpoint){{
+      var NL=String.fromCharCode(10);
+      var body='Name: '+d.get('name')+NL+'Email: '+d.get('email')+NL+'Organisation: '+(d.get('organisation')||'-')+NL+'Enquiry type: '+d.get('enquiry_type')+NL+NL+d.get('message');
+      window.location.href='mailto:'+to+'?subject='+encodeURIComponent('[CEL Lab] '+d.get('enquiry_type')+' - '+d.get('name'))+'&body='+encodeURIComponent(body);
+      st.className='fmsg ok';st.textContent='Your email app should open with the message filled in. If it does not, write to '+to+'.';return;
+    }}
+    btn.disabled=true;st.className='fmsg';st.textContent='Sending…';
+    fetch(endpoint,{{method:'POST',body:d,headers:{{'Accept':'application/json'}}}}).then(function(r){{
+      if(r.ok){{f.reset();st.className='fmsg ok';st.textContent='Thank you — your message has been sent.';}}
+      else{{st.className='fmsg err';st.textContent='Something went wrong. Please email '+to+' directly.';}}
+    }}).catch(function(){{st.className='fmsg err';st.textContent='Could not send. Please email '+to+' directly.';}})
+    .finally(function(){{btn.disabled=false;}});
+  }});
+}})();
+</script>
 """
     return page("Contact", body, "contact.html")
 

@@ -8,7 +8,8 @@ LAB = {
     "address": "Department of Humanities & Social Sciences, Indian Institute of Technology Roorkee, Roorkee 247667, Uttarakhand, India",
     "email": "aviral.marwal@hs.iitr.ac.in",
     "domain": "cel-lab.in",
-    "cname_live": False,    # set True after the domain's DNS points at GitHub Pages
+    "cname_live": False,
+    "form_endpoint": "",   # Formspree endpoint, e.g. "https://formspree.io/f/abcdwxyz"; empty = email-client fallback    # set True after the domain's DNS points at GitHub Pages
     "description": (
         "CEL Lab is an urban economics and policy research group at IIT Roorkee. "
         "We treat cities as places to experiment and learn: building empirical evidence on "

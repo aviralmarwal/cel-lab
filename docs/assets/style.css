@@ -252,6 +252,21 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .note p{font-size:15px}
 @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
 
+/* contact form */
+.cform{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:30px 32px}
+.cform h3{font-size:22px;margin-bottom:6px}
+.cform .hint{font-size:14px;color:var(--muted);margin-bottom:20px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);font-family:var(--sans);font-size:15px;color:var(--ink);outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--teal)}
+.fg textarea{min-height:140px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.frow{grid-template-columns:1fr}}
+.fmsg{font-size:14px;margin-top:12px}
+.fmsg.ok{color:var(--teal)}.fmsg.err{color:#b5541c}
+.hp{position:absolute;left:-9999px}
+
 /* footer */
 footer{background:var(--ink);color:rgba(255,255,255,.55);padding-block:36px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}

@@ -32,10 +32,49 @@
     <div class="c-item"><div class="ic">LOC</div><div><strong>Address</strong><span>Department of Humanities &amp; Social Sciences, Indian Institute of Technology Roorkee, Roorkee 247667, Uttarakhand, India</span></div></div>
     <div class="c-item"><div class="ic">WEB</div><div><strong>Web</strong><span>cel-lab.in</span></div></div>
   </div>
-  <div class="note"><h3>Join the lab</h3>
-    <p>We welcome enquiries from prospective PhD students and interns with a background in economics, planning, geography or data science, and from municipal and state agencies interested in collaborative, evidence-based projects. Write to us with a short note on your interests.</p>
-  </div>
+  <form class="cform" id="contactForm" method="POST" action="" novalidate>
+    <h3>Send a message</h3>
+    <p class="hint">We reply to most enquiries within a week.</p>
+    <div class="frow">
+      <div class="fg"><label for="f-name">Name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+      <div class="fg"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label for="f-org">Organisation (optional)</label><input id="f-org" name="organisation" type="text" autocomplete="organization"></div>
+      <div class="fg"><label for="f-type">Enquiry type</label>
+        <select id="f-type" name="enquiry_type">
+          <option>Research collaboration</option><option>PhD / internship enquiry</option><option>Government / municipal request</option><option>Media</option><option>Other</option>
+        </select></div>
+    </div>
+    <div class="fg"><label for="f-msg">Your query</label><textarea id="f-msg" name="message" required></textarea></div>
+    <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    <button class="btn primary" type="submit" id="f-send">Send message</button>
+    <div class="fmsg" id="f-status" aria-live="polite"></div>
+  </form>
 </div></section>
+<script>
+(function(){
+  var f=document.getElementById('contactForm'),st=document.getElementById('f-status'),btn=document.getElementById('f-send');
+  var endpoint='', to='aviral.marwal@hs.iitr.ac.in';
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    if(!f.checkValidity()){st.className='fmsg err';st.textContent='Please fill in your name, email and query.';return;}
+    var d=new FormData(f);
+    if(!endpoint){
+      var NL=String.fromCharCode(10);
+      var body='Name: '+d.get('name')+NL+'Email: '+d.get('email')+NL+'Organisation: '+(d.get('organisation')||'-')+NL+'Enquiry type: '+d.get('enquiry_type')+NL+NL+d.get('message');
+      window.location.href='mailto:'+to+'?subject='+encodeURIComponent('[CEL Lab] '+d.get('enquiry_type')+' - '+d.get('name'))+'&body='+encodeURIComponent(body);
+      st.className='fmsg ok';st.textContent='Your email app should open with the message filled in. If it does not, write to '+to+'.';return;
+    }
+    btn.disabled=true;st.className='fmsg';st.textContent='Sending…';
+    fetch(endpoint,{method:'POST',body:d,headers:{'Accept':'application/json'}}).then(function(r){
+      if(r.ok){f.reset();st.className='fmsg ok';st.textContent='Thank you — your message has been sent.';}
+      else{st.className='fmsg err';st.textContent='Something went wrong. Please email '+to+' directly.';}
+    }).catch(function(){st.className='fmsg err';st.textContent='Could not send. Please email '+to+' directly.';})
+    .finally(function(){btn.disabled=false;});
+  });
+})();
+</script>
 
 </main>
 <footer><div class="wrap">
