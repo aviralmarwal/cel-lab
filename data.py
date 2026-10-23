@@ -325,8 +325,8 @@ PEOPLE = {
         "photo": None,
     },
     "scholars": [
-        {"name": "Nikhil Mishra", "initials": "NM", "role": "Research Scholar · PhD (since Jan 2025)", "topic": "Firm agglomeration and urbanisation", "photo": None},
-        {"name": "Ankita Dey", "initials": "AD", "role": "Research Scholar · PhD (since Jul 2025)", "topic": "Urban land use policy", "photo": None},
+        {"name": "Nikhil Mishra", "initials": "NM", "role": "Research Scholar · PhD (since Jan 2025)", "topic": "Firm agglomeration and urbanisation", "photo": "assets/people/nikhil-mishra.jpg"},
+        {"name": "Ankita Dey", "initials": "AD", "role": "Research Scholar · PhD (since Jul 2025)", "topic": "Urban land use policy", "photo": "assets/people/ankita-dey.jpg"},
     ],
     "interns": [  # current research interns
         {"name": "Shraman Joardar", "initials": "SJ", "role": "Research Intern (since Feb 2026)", "topic": "City-scale slum formation using agent-based modelling", "photo": None},

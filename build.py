@@ -151,7 +151,7 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 /* people */
 .pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
 .avatar{background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;aspect-ratio:1/1}
-.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
 .avatar .ini{font-family:var(--serif);font-size:56px;color:rgba(255,255,255,.9);letter-spacing:-2px;position:relative;z-index:1}
 .avatar svg.bg{position:absolute;inset:0;width:100%;height:100%;opacity:.25}
 .pi-body{padding:28px 32px;display:flex;flex-direction:column;gap:10px}
