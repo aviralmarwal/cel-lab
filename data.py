@@ -322,7 +322,7 @@ PEOPLE = {
             "He holds a PhD in Land Economy from the University of Cambridge."
         ),
         "links": [{"label": "Download CV (PDF)", "url": "assets/people/Aviral-Marwal-CV.pdf"}],  # add e.g. {"label": "Google Scholar", "url": "..."}
-        "photo": None,
+        "photo": "assets/people/aviral-marwal.jpg",
     },
     "scholars": [
         {"name": "Nikhil Mishra", "initials": "NM", "role": "Research Scholar · PhD (since Jan 2025)", "topic": "Firm agglomeration and urbanisation", "photo": "assets/people/nikhil-mishra.jpg"},
