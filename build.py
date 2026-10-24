@@ -125,28 +125,78 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .pgroup .sub{font-size:14px;color:var(--muted);margin-bottom:18px}
 
 /* blog */
-.post-list{display:grid;gap:0}
-.post-row{display:grid;grid-template-columns:130px 1fr;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}
-.post-row .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:6px}
-.post-row h3{font-size:24px;margin-bottom:6px}
-.post-row h3 a{color:var(--ink)}
-.post-row h3 a:hover{color:var(--teal)}
-.post-row p{font-size:15px}
-.post-row .by{font-size:13px;color:var(--muted);margin-top:6px}
-@media(max-width:520px){.post-row{grid-template-columns:1fr;gap:4px}}
-.post{max-width:780px}
-.post .by{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
-.post h2{font-size:28px;margin:36px 0 12px}
-.post h3{font-size:22px;margin:28px 0 10px}
-.post p,.post li{font-size:17px;line-height:1.75;margin-bottom:18px}
-.post ul,.post ol{padding-left:22px;margin-bottom:18px}
+.featured{display:grid;grid-template-columns:1.25fr 1fr;gap:0;background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:40px}
+.featured .cov{aspect-ratio:16/9;background:var(--ink)}
+.featured .cov img{width:100%;height:100%;object-fit:cover;display:block}
+.featured .fb{padding:32px 36px;display:flex;flex-direction:column;gap:12px;justify-content:center;min-width:0}
+.featured h2{font-size:32px}
+.featured h2 a{color:var(--ink)}
+.featured h2 a:hover{color:var(--teal);text-decoration:none}
+.featured p{font-size:16px}
+@media(max-width:820px){.featured{grid-template-columns:1fr}.featured .fb{padding:22px 24px}.featured h2{font-size:26px}}
+.pmeta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pmeta .tagc{color:var(--amber)}
+.grid.posts{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.pcard2{background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.pcard2:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(22,34,46,.09)}
+.pcard2 .cov{aspect-ratio:16/9;background:var(--ink)}
+.pcard2 .cov img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard2 .pb{padding:18px 20px 22px;display:flex;flex-direction:column;gap:8px}
+.pcard2 h3{font-size:21px}
+.pcard2 h3 a{color:var(--ink)}
+.pcard2 h3 a:hover{color:var(--teal);text-decoration:none}
+.pcard2 p{font-size:14.5px}
+
+/* post page */
+.post-hero{background:var(--ink);color:#fff}
+.post-hero .wrap{padding-block:56px 0;max-width:860px}
+.post-hero .pmeta{color:rgba(255,255,255,.6)}
+.post-hero h1{color:#fff;font-size:clamp(32px,4.4vw,52px);margin:14px 0 16px}
+.post-hero .dek{font-size:19px;color:rgba(255,255,255,.75);max-width:62ch;line-height:1.55;margin-bottom:28px}
+.post-hero .byline{display:flex;align-items:center;gap:12px;padding-bottom:36px}
+.post-hero .byline img,.post-hero .byline .ini{width:40px;height:40px;border-radius:50%;object-fit:cover;background:var(--teal);display:flex;align-items:center;justify-content:center;font-family:var(--serif);color:#fff;font-size:16px}
+.post-hero .byline b{display:block;font-weight:500;color:#fff;font-size:14px}
+.post-hero .byline span{font-size:12.5px;color:rgba(255,255,255,.6)}
+.post-cover{max-width:860px;margin:-1px auto 0;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.post-cover img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:0 0 3px 3px;box-shadow:0 14px 36px rgba(22,34,46,.18)}
+.post-wrap{max-width:860px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.post{max-width:700px;margin:0 auto;padding-block:48px 0}
+.post h2{font-size:28px;margin:44px 0 14px}
+.post h3{font-size:22px;margin:30px 0 10px}
+.post p,.post li{font-size:17.5px;line-height:1.75;margin-bottom:20px;color:var(--ink)}
+.post>p:first-of-type::first-letter{font-family:var(--serif);font-size:64px;float:left;line-height:.85;padding:6px 10px 0 0;color:var(--navy)}
+.post ul,.post ol{padding-left:22px;margin-bottom:20px}
 .post li{margin-bottom:8px}
-.post blockquote{border-left:3px solid var(--amber);padding:4px 18px;color:var(--body);font-style:italic;margin:0 0 18px}
-.post img{width:100%;border-radius:3px;margin:8px 0 18px;border:1px solid var(--line)}
+.post strong{font-weight:600;background:linear-gradient(transparent 62%,rgba(232,160,32,.35) 62%)}
+.post blockquote{margin:36px 0;padding:6px 0 6px 26px;border-left:4px solid var(--amber)}
+.post blockquote p{font-family:var(--serif);font-size:26px;line-height:1.35;color:var(--navy);margin:0}
+.post img{width:100%;border-radius:3px;margin:8px 0 6px;border:1px solid var(--line)}
+.post figure{margin:28px 0}
+.post figcaption,.post img+em{display:block;font-size:13.5px;color:var(--muted);margin-bottom:22px}
 .post code{font-family:var(--mono);font-size:14px;background:var(--mist);padding:1px 5px;border-radius:2px}
 .post pre{background:var(--ink);color:#fff;padding:16px 18px;border-radius:3px;overflow-x:auto;margin-bottom:18px}
 .post pre code{background:none;color:inherit}
-.post-nav{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.post hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+.post .note{font-size:14.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.keybox{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:3px;padding:20px 24px 8px;margin:8px 0 36px}
+.keybox .kh{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.keybox ul{list-style:none;padding:0;margin:0}
+.keybox li{font-size:15.5px;line-height:1.5;padding-left:18px;position:relative;margin-bottom:10px;color:var(--ink)}
+.keybox li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;background:var(--amber);border-radius:1px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:8px 0 32px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:14px 16px}
+.stat b{display:block;font-family:var(--serif);font-size:30px;color:var(--navy);line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--muted)}
+.author-box{display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:start;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:24px;margin-top:48px}
+.author-box img,.author-box .ini{width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:var(--serif);color:#fff;font-size:28px}
+.author-box b{font-family:var(--serif);font-weight:400;font-size:20px;color:var(--ink);display:block;margin-bottom:4px}
+.author-box p{font-size:14.5px;margin:0}
+.share{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;align-items:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.share a,.share button{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);background:var(--paper);color:var(--navy);padding:8px 12px;border-radius:2px;cursor:pointer}
+.share a:hover,.share button:hover{border-color:var(--teal);color:var(--teal);text-decoration:none}
+.more-posts{margin-top:56px}
+.more-posts h3{font-size:22px;margin-bottom:16px}
+.post-nav{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 
 /* people */
 .pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
@@ -445,7 +495,7 @@ NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", 
        ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News & Talks"),
        ("teaching.html", "Teaching"), ("blog.html", "Blog"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
 
-def page(title, body, active, depth=0, desc=None):
+def page(title, body, active, depth=0, desc=None, image=None):
     root = "../" * depth
     desc = desc or LAB["description"][:155]
     links = "".join(f'<li><a href="{root}{href}"{" class=\"active\"" if href == active else ""}>{lab}</a></li>' for href, lab in NAV)
@@ -461,6 +511,7 @@ def page(title, body, active, depth=0, desc=None):
 <meta property="og:title" content="{e(title)} · {LAB["short"]}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:type" content="website">
+{f'<meta property="og:image" content="https://{LAB["domain"]}/{image}">' if image else ""}
 <link rel="icon" href="{root}assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -529,6 +580,9 @@ def build_index():
     recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
     news = "".join(f'<div class="news"><div class="kind">{e(n["date_text"])}</div><p style="font-size:15px;color:var(--ink)">{e(n["text"])}</p>'
                    f'<p style="margin-top:8px"><a href="{n["link"]}" class="eyebrow">Read more →</a></p></div>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
+    posts = load_posts()
+    blog_strip = (f'<section class="block"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">{e(BLOG["label"])}</div><h2>From the blog</h2></div><a class="more" href="blog.html">All posts →</a></div>'
+                  f'<div class="grid posts">{"".join(post_card(p) for p in posts[:3])}</div></div></section>') if posts else ""
     body = f"""
 <section class="hero"><div class="wrap">
   <div>
@@ -555,6 +609,7 @@ def build_index():
   <div class="pub-list">{recent}</div>
 </div></section>
 
+{blog_strip}
 <section class="block alt"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">News</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All news &amp; talks →</a></div>
   <div class="news-strip">{news}</div>
@@ -816,36 +871,92 @@ def load_posts():
         txt = open(f, encoding="utf-8").read()
         m = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", txt, re.S)
         if not m: continue
-        meta = dict((k.strip(), v.strip()) for k, v in (ln.split(":", 1) for ln in m.group(1).splitlines() if ":" in ln))
+        meta = {}; key = None
+        for ln in m.group(1).splitlines():
+            if re.match(r"^\s+-\s+", ln) and key:
+                meta.setdefault(key + "_list", []).append(re.sub(r"^\s+-\s+", "", ln).strip())
+            elif ":" in ln:
+                key, v = ln.split(":", 1); key = key.strip(); meta[key] = v.strip()
         slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", os.path.splitext(os.path.basename(f))[0])
+        body_md = m.group(2)
+        words = len(re.findall(r"\w+", body_md))
         posts.append({"slug": slug, "title": meta.get("title", slug), "date": meta.get("date", ""), "author": meta.get("author", ""),
-                      "summary": meta.get("summary", ""), "html": markdown.markdown(m.group(2), extensions=["extra", "smarty"])})
+                      "summary": meta.get("summary", ""), "image": meta.get("image", ""), "tags": [t.strip() for t in meta.get("tags", "").split(",") if t.strip()],
+                      "highlights": meta.get("highlights_list", []), "minutes": max(1, round(words / 220)),
+                      "html": markdown.markdown(body_md, extensions=["extra", "smarty", "attr_list"])})
     return sorted(posts, key=lambda p: p["date"], reverse=True)
 
 def nice_date(s):
     try: return datetime.date.fromisoformat(s).strftime("%-d %B %Y")
     except Exception: return s
 
+def post_meta(p, root=""):
+    tags = " ".join(f'<span class="tagc">{e(t)}</span>' for t in p["tags"])
+    return f'<div class="pmeta">{tags}<span>{e(nice_date(p["date"]))}</span><span>{p["minutes"]} min read</span></div>'
+
+def post_card(p, root=""):
+    cov = f'<a class="cov" href="{root}blog/{p["slug"]}.html"><img src="{root}{p["image"]}" alt="" loading="lazy"></a>' if p["image"] else ""
+    return (f'<article class="pcard2">{cov}<div class="pb">{post_meta(p)}<h3><a href="{root}blog/{p["slug"]}.html">{e(p["title"])}</a></h3>'
+            f'<p>{e(p["summary"])}</p></div></article>')
+
 def build_blog(posts):
-    rows = "".join(f'<div class="post-row"><div class="d">{e(nice_date(p["date"]))}</div><div><h3><a href="blog/{p["slug"]}.html">{e(p["title"])}</a></h3>'
-                   f'<p>{e(p["summary"])}</p><div class="by">{e(p["author"])}</div></div></div>' for p in posts) or '<p class="muted">No posts yet.</p>'
+    if not posts:
+        body_main = '<p class="muted">No posts yet.</p>'
+    else:
+        f = posts[0]
+        cov = f'<a class="cov" href="blog/{f["slug"]}.html"><img src="{f["image"]}" alt=""></a>' if f["image"] else ""
+        featured = (f'<article class="featured">{cov}<div class="fb">{post_meta(f)}<h2><a href="blog/{f["slug"]}.html">{e(f["title"])}</a></h2>'
+                    f'<p>{e(f["summary"])}</p><div class="pmeta"><span>By {e(f["author"])}</span></div></div></article>')
+        rest = "".join(post_card(p) for p in posts[1:])
+        body_main = featured + (f'<div class="grid posts">{rest}</div>' if rest else "")
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">{e(BLOG["label"])}</div><h1>Notes from the lab</h1><p>{e(BLOG["intro"])}</p>
 </div></div></section>
-<section class="block"><div class="wrap"><div class="post-list">{rows}</div></div></section>
+<section class="block"><div class="wrap">{body_main}</div></section>
 """
     return page(BLOG["label"], body, "blog.html")
 
-def build_post(p):
+def build_post(p, posts):
+    pi = PEOPLE["pi"]
+    is_pi = p["author"].replace("Dr. ", "") in pi["name"]
+    av = f'<img src="../{pi["photo"]}" alt="">' if (is_pi and pi.get("photo")) else f'<div class="ini">{"".join(w[0] for w in p["author"].replace("Dr. ", "").split()[:2])}</div>'
+    role = pi["role"].split(" · ")[-1] + ", " + LAB["inst"] if is_pi else LAB["short"]
+    cover = f'<div class="post-cover"><img src="../{p["image"]}" alt=""></div>' if p["image"] else ""
+    hl = ""
+    if p["highlights"]:
+        hl = '<div class="keybox"><div class="kh">In brief</div><ul>' + "".join(f"<li>{e(h)}</li>" for h in p["highlights"]) + "</ul></div>"
+    bio = pi["bio"] if is_pi else ""
+    author_box = (f'<div class="author-box">{av.replace("<div class=", "<div class=")}<div><b>{e(p["author"])}</b><p>{e(bio)}</p></div></div>') if bio else ""
+    others = [q for q in posts if q["slug"] != p["slug"]][:3]
+    more = (f'<div class="more-posts"><h3>More from the blog</h3><div class="grid posts">{"".join(post_card(q, "../") for q in others)}</div></div>') if others else ""
+    url = f'https://{LAB["domain"]}/blog/{p["slug"]}.html'
     body = f"""
-<section class="page-head"><div class="wrap"><div>
-  <div class="eyebrow"><a href="../blog.html">{e(BLOG["label"])}</a></div><h1>{e(p["title"])}</h1>
-</div></div></section>
-<section class="block"><div class="wrap"><article class="post"><div class="by">{e(p["author"])} · {e(nice_date(p["date"]))}</div>{p["html"]}
-<div class="post-nav"><a href="../blog.html">← All posts</a></div></article></div></section>
+<section class="post-hero"><div class="wrap">
+  <div class="pmeta"><a href="../blog.html" style="color:inherit">{e(BLOG["label"])}</a>{"".join(f'<span class="tagc">{e(t)}</span>' for t in p["tags"])}</div>
+  <h1>{e(p["title"])}</h1>
+  <p class="dek">{e(p["summary"])}</p>
+  <div class="byline">{av}<div><b>{e(p["author"])}</b><span>{e(role)} · {e(nice_date(p["date"]))} · {p["minutes"]} min read</span></div></div>
+</div></section>
+{cover}
+<div class="post-wrap"><article class="post">
+{hl}
+{p["html"]}
+<div class="share"><span>Share</span>
+  <a href="https://twitter.com/intent/tweet?text={html.escape(p["title"])}&url={url}" target="_blank" rel="noopener">X / Twitter</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={url}" target="_blank" rel="noopener">LinkedIn</a>
+  <a href="https://wa.me/?text={html.escape(p["title"])}%20{url}" target="_blank" rel="noopener">WhatsApp</a>
+  <button type="button" id="copyLink" data-url="{url}">Copy link</button></div>
+{author_box}
+{more}
+<div class="post-nav"><a href="../blog.html">← All posts</a></div>
+</article></div>
+<script>
+(function(){{var c=document.getElementById('copyLink');if(!c)return;c.addEventListener('click',function(){{var u=location.href.split('#')[0];
+(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){{c.textContent='Copied';setTimeout(function(){{c.textContent='Copy link';}},1800);}},function(){{window.prompt('Copy this link',u);}});}});}})();
+</script>
 """
-    return page(p["title"], body, "blog.html", depth=1, desc=p["summary"])
+    return page(p["title"], body, "blog.html", depth=1, desc=p["summary"], image=p["image"] or None)
 
 def build_events():
     items = "".join(event_html(ev) for ev in EVENTS_SORTED)
@@ -917,7 +1028,7 @@ def main():
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
     for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
     posts = load_posts(); w("blog.html", build_blog(posts))
-    for p in posts: w(f"blog/{p['slug']}.html", build_post(p))
+    for p in posts: w(f"blog/{p['slug']}.html", build_post(p, posts))
     if LAB.get("cname_live"): w("CNAME", LAB["domain"] + "\n")  # only once DNS for the domain points at GitHub
     print("built", sum(len(f) for _, _, f in os.walk(OUT)), "files in", OUT)
 

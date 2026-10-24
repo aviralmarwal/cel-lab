@@ -3,15 +3,23 @@ title: What does it cost to leave a plot empty in India?
 date: 2026-10-24
 author: Aviral Marwal
 summary: The same vacant plot is taxed at ₹82,000 a year in Mumbai, ₹200 in Surat and nothing at all in Bareilly. Our 38-city database shows how little this has to do with land prices.
+image: assets/blog/cover-plot-empty.jpg
+tags: Vacant land tax, Municipal finance
+highlights:
+  - Holding a standard 1,200 sq ft vacant plot costs ₹82,000 a year in core Mumbai, ₹201 in Surat's priciest neighbourhood, and nothing in Bareilly.
+  - Indian cities use four different designs: market-linked, city-set rate tables, flat road-width charges, and outright exemption.
+  - Three Gujarat cities apply the same law and end up 35 times apart, purely through the vacant-plot discount each council chose.
+  - Kolkata is the only city that taxes an empty plot more than a built one.
 ---
 
 Take a residential plot of 1,200 square feet. Leave it empty. Now ask what the city charges you each year for the privilege of doing nothing with it.
 
-In Mumbai, in a typical core locality, the answer is a little over ₹82,000. On Malabar Hill it crosses ₹1.5 lakh. In Hyderabad or Vijayawada it is somewhere between ₹37,000 and ₹49,000. In Delhi it is about ₹3,800. In Bangalore, ₹1,500. In Patna, ₹550. In Vesu, the most expensive neighbourhood in Surat, it is ₹201. And in Bareilly it is zero, because the Nagar Nigam does not tax vacant land at all.
+In Mumbai, in a typical core locality, the answer is **a little over ₹82,000**. On Malabar Hill it crosses ₹1.5 lakh. In Hyderabad or Vijayawada it is somewhere between ₹37,000 and ₹49,000. In Delhi it is about ₹3,800. In Bangalore, ₹1,500. In Patna, ₹550. In Vesu, the most expensive neighbourhood in Surat, it is **₹201**. And in Bareilly it is **zero**, because the Nagar Nigam does not tax vacant land at all.
 
-That is a spread of several hundred times for the same thing in the same country. Land prices do not explain it. Land in Vesu is expensive by any standard except south Mumbai's, and the gap between the two is nowhere near four hundred times. Most of the difference is design.
+That is a spread of **several hundred times** for the same thing in the same country. Land prices do not explain it. Land in Vesu is expensive by any standard except south Mumbai's, and the gap between the two is nowhere near four hundred times. Most of the difference is design.
 
 ![Annual vacant-land tax on a standard plot across 37 Indian cities, 2025](../assets/blog/vlt-38-cities-2025.svg)
+*Median of core localities in each city, 2025, in rupees per square metre per year. Varanasi is omitted for want of a verified 2025 rate. Source: CEL Lab vacant land tax database.*
 
 ## Where the numbers come from
 
@@ -35,9 +43,11 @@ The fourth group, so far consisting of Bareilly, simply exempts vacant land.
 
 The clearest illustration of how much design matters comes from Gujarat, where three large cities tax property under the same state act, with the same formula: a base rate, multiplied by a location factor, multiplied by a factor for the type of property.
 
-Ahmedabad applies no discount for vacant plots. The open-plot factor is 1.0, and a plot in Vastrapur pays about ₹7,000 a year. Vadodara applies a 50 percent discount, and a comparable plot in Sayajigunj pays about ₹1,100. Surat applies a 90 percent discount, and Vesu pays ₹201. Three councils, one law, a 35-fold difference in what it costs to hold land idle.
+Ahmedabad applies no discount for vacant plots. The open-plot factor is 1.0, and a plot in Vastrapur pays about ₹7,000 a year. Vadodara applies a 50 percent discount, and a comparable plot in Sayajigunj pays about ₹1,100. Surat applies a 90 percent discount, and Vesu pays ₹201. Three councils, one law, **a 35-fold difference** in what it costs to hold land idle.
 
-Kolkata went the other way. Under its unit area system, standalone vacant land carries a usage multiplier of 2.0, double the multiplier for a built house on the same plot. It is the only city in our database that deliberately taxes an empty plot more heavily than an occupied one. When the system came in, the tax on a plot in Alipore went from about ₹9,500 a year to about ₹36,000.
+> Three councils, one law, and a 35-fold difference in what it costs to hold land idle.
+
+Kolkata went the other way. Under its unit area system, standalone vacant land carries a usage multiplier of 2.0, double the multiplier for a built house on the same plot. It is **the only city in our database that deliberately taxes an empty plot more heavily than an occupied one**. When the system came in, the tax on a plot in Alipore went from about ₹9,500 a year to about ₹36,000.
 
 ## Why we care
 
@@ -47,4 +57,4 @@ The argument is old and simple. If an empty plot costs almost nothing to keep, a
 
 What the chart already tells us is that India is running a natural experiment on an enormous scale. Thirty-eight cities, four designs, a range of several hundred times in the holding cost of land. If the tax matters for sprawl, it should show up here.
 
-*A note on the data. All figures are for a standard residential plot, confirmed from primary sources or extended from a confirmed adjacent year on a stated basis. Rajasthan and Haryana cities use a 350 square yard plot because smaller plots are exempt there; Gwalior uses 1,501 square feet for the same reason. Annual rupee figures quoted in the text are for a 1,200 square foot plot. The full methodology and the city-by-city sourcing notes will be released with the paper.*
+<p class="note"><em>A note on the data.</em> All figures are for a standard residential plot, confirmed from primary sources or extended from a confirmed adjacent year on a stated basis. Rajasthan and Haryana cities use a 350 square yard plot because smaller plots are exempt there; Gwalior uses 1,501 square feet for the same reason. Annual rupee figures quoted in the text are for a 1,200 square foot plot. The full methodology and the city-by-city sourcing notes will be released with the paper.</p>
