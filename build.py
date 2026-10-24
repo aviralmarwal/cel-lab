@@ -2,6 +2,7 @@
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
 import os, shutil, html, math, random, re, glob, datetime
 import markdown
+import dashboard_vlt
 from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING, THESES, BLOG
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
@@ -48,12 +49,12 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-heigh
 .mono .c{color:var(--teal)}.mono .e{color:var(--navy)}.mono .l{color:var(--amber)}
 .brand-text{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1.35}
 .brand-text strong{display:block;color:var(--ink);font-size:11px}
-.links{display:flex;gap:28px;list-style:none}
-.links a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--body);padding:6px 0;border-bottom:2px solid transparent}
+.links{display:flex;gap:22px;list-style:none;white-space:nowrap}
+.links a{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--body);padding:6px 0;border-bottom:2px solid transparent}
 .links a:hover{color:var(--teal);text-decoration:none}
 .links a.active{color:var(--navy);border-color:var(--amber)}
 .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:2px;padding:8px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);cursor:pointer}
-@media(max-width:820px){
+@media(max-width:1000px){
   .links{display:none;position:absolute;left:0;right:0;top:68px;background:var(--cream);border-bottom:1px solid var(--line);flex-direction:column;gap:0;padding:8px 20px 16px}
   .links.open{display:flex}
   .links a{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -198,6 +199,7 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .more-posts h3{font-size:22px;margin-bottom:16px}
 .post-nav{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 
+DASHCSS_PLACEHOLDER
 /* people */
 .pi-card{background:var(--paper);border:1px solid var(--line);border-radius:3px;display:grid;grid-template-columns:220px 1fr;gap:0;overflow:hidden;margin-bottom:48px}
 .avatar{background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;aspect-ratio:1/1}
@@ -492,8 +494,8 @@ def avatar_bg(seed):
 
 # ───────────────────────── Templates ─────────────────────────
 NAV = [("index.html", "Home"), ("research.html", "Research"), ("projects.html", "Projects"),
-       ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News & Talks"),
-       ("teaching.html", "Teaching"), ("blog.html", "Blog"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
+       ("people.html", "People"), ("publications.html", "Publications"), ("events.html", "News"),
+       ("teaching.html", "Teaching"), ("blog.html", "Blog"), ("data.html", "Data"), ("opportunities.html", "Join us"), ("contact.html", "Contact")]
 
 def page(title, body, active, depth=0, desc=None, image=None):
     root = "../" * depth
@@ -958,6 +960,34 @@ def build_post(p, posts):
 """
     return page(p["title"], body, "blog.html", depth=1, desc=p["summary"], image=p["image"] or None)
 
+DATA_ITEMS = [
+    {"kind": "Interactive dashboard", "title": "Vacant land tax across Indian cities", "href": "data/vlt-dashboard.html",
+     "thumb": "assets/blog/cover-plot-empty.jpg",
+     "desc": "38 cities, 16 states, 2011–2025. Map, ranking and city-by-city formulas for what it costs to hold a residential plot empty."},
+    {"kind": "Data story", "title": "What does it cost to leave a plot empty in India?", "href": "blog/what-it-costs-to-leave-a-plot-empty.html",
+     "thumb": "assets/blog/vlt-38-cities-2025.svg", "desc": "A 400-fold spread in the holding cost of the same plot, and the four tax designs behind it."},
+    {"kind": "Data story", "title": "The frozen tax", "href": "blog/the-frozen-tax.html",
+     "thumb": "assets/blog/vlt-frozen-rates.svg", "desc": "Nine cities whose rates did not move for a decade or more, and what happened when they finally did."},
+    {"kind": "Data story", "title": "Who really pays?", "href": "blog/who-really-pays.html",
+     "thumb": "assets/blog/vlt-core-periphery-ratio.svg", "desc": "Core-to-periphery tax ratios for 36 cities, from 9× in Amritsar to below 1 in Kalaburagi."},
+]
+
+def build_data_index():
+    cards = "".join(f'<a class="card" href="{d["href"]}"><div class="thumb" style="aspect-ratio:16/9;background:var(--paper)"><img src="{d["thumb"]}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"></div>'
+                    f'<div class="card-body"><div class="eyebrow amber">{e(d["kind"])}</div><h3>{e(d["title"])}</h3><p>{e(d["desc"])}</p><span class="cta">Open →</span></div></a>' for d in DATA_ITEMS)
+    body = f"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow">Data &amp; visuals</div><h1>Datasets, dashboards and charts</h1>
+  <p>Interactive views and single-chart stories built from the datasets the lab assembles. We publish aggregates and visuals here; underlying data are released with the papers or on request.</p>
+</div></div></section>
+<section class="block"><div class="wrap"><div class="grid themes ds-grid">{cards}</div></div></section>
+"""
+    return page("Data & Visuals", body, "data.html")
+
+def build_vlt_dashboard():
+    return page("Vacant land tax dashboard", dashboard_vlt.BODY, "data.html", depth=1,
+                desc="Interactive dashboard: vacant land tax on a standard plot across 38 Indian cities, 2011–2025.")
+
 def build_events():
     items = "".join(event_html(ev) for ev in EVENTS_SORTED)
     news = "".join(f'<li><span class="d">{e(n["date_text"])}</span>{e(n["text"])}</li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True))
@@ -1016,9 +1046,9 @@ FAVICON = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect wi
 
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
-    os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research")); os.makedirs(os.path.join(OUT, "blog"))
+    os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research")); os.makedirs(os.path.join(OUT, "blog")); os.makedirs(os.path.join(OUT, "data"))
     w = lambda rel, s: open(os.path.join(OUT, rel), "w", encoding="utf-8").write(s)
-    w("assets/style.css", CSS.strip() + "\n")
+    w("assets/style.css", CSS.replace('DASHCSS_PLACEHOLDER', dashboard_vlt.CSS).strip() + "\n")
     w("assets/favicon.svg", FAVICON)
     w("index.html", build_index()); w("research.html", build_research()); w("projects.html", build_projects())
     w("people.html", build_people()); w("publications.html", build_publications()); w("contact.html", build_contact())
@@ -1027,6 +1057,7 @@ def main():
     if os.path.isdir(src_assets):
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
     for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
+    w("data.html", build_data_index()); w("data/vlt-dashboard.html", build_vlt_dashboard())
     posts = load_posts(); w("blog.html", build_blog(posts))
     for p in posts: w(f"blog/{p['slug']}.html", build_post(p, posts))
     if LAB.get("cname_live"): w("CNAME", LAB["domain"] + "\n")  # only once DNS for the domain points at GitHub

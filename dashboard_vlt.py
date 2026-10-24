@@ -1,0 +1,150 @@
+# Builds the Vacant Land Tax dashboard page body (used by build.py).
+# Data: docs/assets/data/vlt-cities.json (city-level aggregates only) + india-outline.json
+
+CSS = r"""
+/* data & visuals */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:0 0 28px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:14px 16px}
+.kpi b{display:block;font-family:var(--serif);font-size:30px;color:var(--navy);line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:end;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:16px 20px;margin-bottom:22px}
+.ctrl label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ctrl select{padding:9px 12px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);font-family:var(--sans);font-size:14px;color:var(--ink);min-width:150px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);color:var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.chip.off{opacity:.4}
+.dash{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;align-items:start}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:18px 20px;min-width:0}
+.panel h3{font-size:18px;margin-bottom:4px}
+.panel .sub{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+#map svg{width:100%;height:auto;display:block}
+#map .land{fill:#ece7dd;stroke:#fff;stroke-width:.8}
+#map .dot{cursor:pointer;stroke:#fff;stroke-width:1.2;transition:r .15s}
+#map .dot:hover,#map .dot.sel{stroke:var(--ink);stroke-width:2}
+#map .lbl{font-family:var(--sans);font-size:10px;fill:#3d4752;pointer-events:none}
+#bars svg{width:100%;height:auto;display:block}
+#bars .bar{cursor:pointer}
+#bars .bar:hover rect{opacity:1}
+#bars text{font-family:var(--sans)}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:8px 10px;border-radius:3px;max-width:240px;line-height:1.4;display:none}
+.detail{margin-top:22px}
+.detail .dh{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:6px}
+.detail h2{font-size:30px}
+.detail .tag{font-family:var(--mono)}
+.detail .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+.detail .fact b{display:block;font-family:var(--serif);font-size:24px;color:var(--navy);font-variant-numeric:tabular-nums}
+.detail .fact span{font-size:12px;color:var(--muted)}
+.detail p{font-size:15px;max-width:80ch}
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:10px}
+.dgrid table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.dgrid th,.dgrid td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--line)}
+.dgrid th:first-child,.dgrid td:first-child{text-align:left}
+.dgrid th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+#spark svg{width:100%;height:auto}
+.dnote{font-size:13px;color:var(--muted);margin-top:14px}
+@media(max-width:900px){.dash,.dgrid{grid-template-columns:1fr}}
+.ds-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+"""
+
+BODY = r"""
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow"><a href="../data.html">Data &amp; visuals</a> / Dashboard</div>
+  <h1>Vacant land tax across Indian cities</h1>
+  <p>What it costs to hold a standard residential plot empty, in 38 cities and 16 states, from 2011 to 2025. Pick a year and a measure, filter by tax design, and click a city for its formula and history.</p>
+</div></div></section>
+<section class="block"><div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="yearSel">Year</label><select id="yearSel"><option value="2025" selected>2025</option><option value="2021">2021</option><option value="2016">2016</option><option value="2011">2011</option></select></div>
+    <div class="ctrl"><label for="metricSel">Measure</label><select id="metricSel">
+      <option value="Core" selected>Tax in core localities (₹/m²/yr)</option>
+      <option value="Periphery">Tax in peripheral localities (₹/m²/yr)</option>
+      <option value="ratio">Core ÷ periphery ratio</option></select></div>
+    <div class="ctrl"><label for="stateSel">State</label><select id="stateSel"><option value="">All states</option></select></div>
+    <div class="ctrl"><label>Tax design</label><div class="chips" id="chips"></div></div>
+  </div>
+  <div class="dash">
+    <div class="panel"><h3>Where the cities are</h3><div class="sub" id="mapSub"></div><div id="map"></div></div>
+    <div class="panel"><h3 id="barTitle">Ranked</h3><div class="sub" id="barSub"></div><div id="bars"></div></div>
+  </div>
+  <div class="panel detail" id="detail"><p class="muted">Click a city on the map or in the chart to see its tax formula and history.</p></div>
+  <p class="dnote">Figures are medians across the localities sampled in each city (typically 10–15, running from the centre to the edge), for a standard residential plot, in nominal rupees per square metre per year. Only confirmed figures and documented continuity estimates are shown; blanks are gaps, not zeros. Locality-level data are not published. Source: CEL Lab vacant land tax database, 2026. Map outline: @svg-maps/india (MIT).</p>
+</div></section>
+<div class="tip" id="tip"></div>
+<script>
+(function(){
+var COL={"Linked to market / guidance value":"#0e7c7b","Zone or unit-area rate set by the city":"#1a3a5c","Flat rate by road type":"#d9901a","Vacant land exempt":"#9b8ea0"};
+var SHORT={"Linked to market / guidance value":"Market-linked","Zone or unit-area rate set by the city":"City rate table","Flat rate by road type":"Flat by road","Vacant land exempt":"Exempt"};
+var DATA=null, IND=null, state={year:"2025",metric:"Core",state:"",off:{},sel:null};
+var tip=document.getElementById('tip');
+function fmt(v){return v==null?'–':(v>=100?'₹'+Math.round(v).toLocaleString('en-IN'):v>=10?'₹'+v.toFixed(0):'₹'+v.toFixed(1));}
+function nearestYear(series,y){var ys=Object.keys(series).map(Number);if(!ys.length)return null;var t=+y;var best=null,bd=99;ys.forEach(function(k){var d=Math.abs(k-t);if(d<bd||(d===bd&&k<t)){bd=d;best=k;}});return bd<=2?String(best):null;}
+function value(c){var yr=nearestYear(c.series,state.year);if(!yr)return null;var s=c.series[yr];
+  if(state.metric==='ratio'){return (s.Core!=null&&s.Periphery)?s.Core/s.Periphery:null;}
+  return s[state.metric]==null?null:s[state.metric];}
+function visible(){return Object.keys(DATA).filter(function(n){var c=DATA[n];return !state.off[c.system]&&(!state.state||c.state===state.state);});}
+function showTip(ev,html){tip.innerHTML=html;tip.style.display='block';var x=ev.clientX+14,y=ev.clientY+14;if(x+250>innerWidth)x=ev.clientX-250;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){tip.style.display='none';}
+function kpis(){var names=Object.keys(DATA);var states={};var locs=0;names.forEach(function(n){states[DATA[n].state]=1;locs+=DATA[n].localities;});
+  var vals=names.map(function(n){var s=DATA[n].series['2025'];return s&&s.Core;}).filter(function(v){return v!=null&&v>0;});
+  document.getElementById('kpis').innerHTML=[[names.length,'cities'],[Object.keys(states).length,'states'],[locs,'localities sampled'],['2011–25','years covered'],[fmt(Math.min.apply(null,vals))+' – '+fmt(Math.max.apply(null,vals)),'core rate range, 2025']].map(function(k){return '<div class="kpi"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('');}
+function chips(){var el=document.getElementById('chips');el.innerHTML=Object.keys(COL).map(function(k){return '<button type="button" class="chip'+(state.off[k]?' off':'')+'" data-k="'+k+'"><i style="background:'+COL[k]+'"></i>'+SHORT[k]+'</button>';}).join('');
+  el.querySelectorAll('.chip').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.k;state.off[k]=!state.off[k];chips();render();});});}
+function drawMap(){var names=visible();var vals=names.map(function(n){return value(DATA[n]);}).filter(function(v){return v!=null;});var vmax=Math.max.apply(null,vals.concat([1]));
+  var W=IND.w,H=IND.h;function merc(lat){return Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));}
+  function P(lon,lat){return [(lon-IND.lon0)/(IND.lon1-IND.lon0)*W,(merc(IND.lat1)-merc(lat))/(merc(IND.lat1)-merc(IND.lat0))*H];}
+  var s='<svg viewBox="'+IND.viewBox+'" role="img" aria-label="Map of cities in the database">'+IND.states.map(function(st){return '<path class="land" d="'+st.d+'"><title>'+st.name+'</title></path>';}).join('');
+  var items=names.map(function(n){var c=DATA[n];var v=value(c);var p=P(c.lon,c.lat);var r=v==null?3:(state.metric==='ratio'?4+Math.sqrt(v)*4:4+Math.sqrt(v/vmax)*18);return {n:n,c:c,v:v,x:p[0],y:p[1],r:r};});
+  items.sort(function(a,b){return b.r-a.r;});
+  items.forEach(function(it){s+='<circle class="dot'+(state.sel===it.n?' sel':'')+'" data-n="'+it.n+'" cx="'+it.x.toFixed(1)+'" cy="'+it.y.toFixed(1)+'" r="'+it.r.toFixed(1)+'" fill="'+COL[it.c.system]+'" fill-opacity="'+(it.v==null?.35:.8)+'"/>';});
+  items.forEach(function(it){if(it.r>=12||['Delhi','Mumbai','Chennai','Kolkata','Bangalore','Hyderabad'].indexOf(it.n)>-1)s+='<text class="lbl" x="'+(it.x+it.r+3).toFixed(1)+'" y="'+(it.y+3.5).toFixed(1)+'">'+it.n+'</text>';});
+  s+='</svg>';var el=document.getElementById('map');el.innerHTML=s;
+  el.querySelectorAll('.dot').forEach(function(d){var n=d.dataset.n,c=DATA[n],v=value(c);
+    d.addEventListener('mousemove',function(ev){showTip(ev,'<b>'+n+'</b>, '+c.state+'<br>'+(v==null?'No figure for '+state.year:(state.metric==='ratio'?v.toFixed(2)+'× core ÷ periphery':fmt(v)+' per m² per year ('+(state.metric==='Core'?'core':'periphery')+')'))+'<br><span style="opacity:.7">'+SHORT[c.system]+'</span>');});
+    d.addEventListener('mouseleave',hideTip);d.addEventListener('click',function(){select(n);});});
+  document.getElementById('mapSub').textContent=(state.metric==='ratio'?'Dot size: core ÷ periphery ratio':'Dot size: tax per m² in '+state.year)+' · colour: tax design';}
+function drawBars(){var names=visible().map(function(n){return {n:n,v:value(DATA[n])};}).filter(function(d){return d.v!=null;}).sort(function(a,b){return b.v-a.v;});
+  var rowh=19,left=100,W=560,H=28+rowh*names.length+8;var vmax=Math.max.apply(null,names.map(function(d){return d.v;}).concat([1]));
+  var log=state.metric!=='ratio';var lo=log?Math.log10(1):0,hi=log?Math.log10(Math.max(vmax,10)):vmax;
+  function X(v){if(log){return left+(v<=1?0:(Math.log10(v)-lo)/(hi-lo))*(W-left-70);}return left+v/hi*(W-left-70);}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ranked bar chart">';
+  var ticks=log?[1,10,100,1000].filter(function(t){return t<=Math.max(vmax,10)*1.01;}):[0,1,2,4,6,8,10].filter(function(t){return t<=vmax;});
+  ticks.forEach(function(t){s+='<line x1="'+X(t).toFixed(1)+'" y1="18" x2="'+X(t).toFixed(1)+'" y2="'+(H-8)+'" stroke="#e6e0d6"/><text x="'+X(t).toFixed(1)+'" y="12" font-size="10" fill="#737b84" text-anchor="middle">'+(log?'₹'+t.toLocaleString('en-IN'):t+'×')+'</text>';});
+  if(!log)s+='<line x1="'+X(1).toFixed(1)+'" y1="18" x2="'+X(1).toFixed(1)+'" y2="'+(H-8)+'" stroke="#d9901a" stroke-width="1.5"/>';
+  names.forEach(function(d,i){var y=24+i*rowh,c=DATA[d.n];s+='<g class="bar" data-n="'+d.n+'"><text x="'+(left-6)+'" y="'+(y+11)+'" font-size="11" fill="#16222e" text-anchor="end"'+(state.sel===d.n?' font-weight="700"':'')+'>'+d.n+'</text>'+
+    '<rect x="'+left+'" y="'+(y+2)+'" width="'+Math.max(X(d.v)-left,2).toFixed(1)+'" height="12" fill="'+COL[c.system]+'" opacity="'+(state.sel===d.n?1:.85)+'"/>'+
+    '<text x="'+(X(d.v)+4).toFixed(1)+'" y="'+(y+12)+'" font-size="10" fill="#3d4752">'+(state.metric==='ratio'?d.v.toFixed(2)+'×':fmt(d.v))+'</text></g>';});
+  s+='</svg>';var el=document.getElementById('bars');el.innerHTML=s;
+  el.querySelectorAll('.bar').forEach(function(g){g.addEventListener('click',function(){select(g.dataset.n);});});
+  document.getElementById('barTitle').textContent=state.metric==='ratio'?'How much more the centre pays than the edge':(state.metric==='Core'?'Tax in core localities, ':'Tax in peripheral localities, ')+state.year;
+  document.getElementById('barSub').textContent=names.length+' cities with a figure'+(state.metric==='ratio'?' · ratio of medians; 1× means the same tax everywhere':' · ₹ per m² per year, log scale');}
+function spark(c){var ys=Object.keys(c.series).filter(function(y){return +y>=2011;}).sort();if(ys.length<2)return '<p class="muted" style="font-size:13px">Not enough years for a chart.</p>';
+  var W=420,H=170,l=40,t=16,b=28,r=10;var all=[];ys.forEach(function(y){['Core','Middle','Periphery'].forEach(function(k){if(c.series[y][k]!=null)all.push(c.series[y][k]);});});var vmax=Math.max.apply(null,all)*1.15||1;
+  function X(y){return l+(+y-2011)/(2025-2011)*(W-l-r);}function Y(v){return t+(1-v/vmax)*(H-t-b);}
+  var s='<svg viewBox="0 0 '+W+' '+H+'">';[2011,2016,2021,2025].forEach(function(y){s+='<text x="'+X(y)+'" y="'+(H-10)+'" font-size="10" fill="#737b84" text-anchor="middle">'+y+'</text>';});
+  s+='<line x1="'+l+'" y1="'+Y(0)+'" x2="'+(W-r)+'" y2="'+Y(0)+'" stroke="#d9d2c6"/>';
+  var cols={Core:'#1a3a5c',Middle:'#0e7c7b',Periphery:'#d9901a'};
+  ['Core','Middle','Periphery'].forEach(function(k){var pts=ys.filter(function(y){return c.series[y][k]!=null;});if(!pts.length)return;var d='';
+    pts.forEach(function(y,i){var x=X(y),yy=Y(c.series[y][k]);if(i>0){d+=' L'+x.toFixed(1)+' '+Y(c.series[pts[i-1]][k]).toFixed(1);}d+=(i?' L':'M')+x.toFixed(1)+' '+yy.toFixed(1);});
+    var last=pts[pts.length-1];d+=' L'+X(2025).toFixed(1)+' '+Y(c.series[last][k]).toFixed(1);
+    s+='<path d="'+d+'" fill="none" stroke="'+cols[k]+'" stroke-width="2.2"/>';pts.forEach(function(y){s+='<circle cx="'+X(y).toFixed(1)+'" cy="'+Y(c.series[y][k]).toFixed(1)+'" r="3" fill="'+cols[k]+'"/>';});
+    s+='<text x="'+(X(2025)-2)+'" y="'+(Y(c.series[last][k])-6).toFixed(1)+'" font-size="10" fill="'+cols[k]+'" text-anchor="end">'+k+' '+fmt(c.series[last][k])+'</text>';});
+  return s+'</svg>';}
+function select(n){state.sel=n;var c=DATA[n];var ys=Object.keys(c.series).sort();var latest=ys[ys.length-1];var s=c.series[latest];var ratio=(s.Core!=null&&s.Periphery)?(s.Core/s.Periphery).toFixed(2)+'×':'–';
+  var rows=ys.map(function(y){var r=c.series[y];return '<tr><td>'+y+'</td><td>'+fmt(r.Core)+'</td><td>'+fmt(r.Middle)+'</td><td>'+fmt(r.Periphery)+'</td><td>'+r.n+'</td></tr>';}).join('');
+  document.getElementById('detail').innerHTML='<div class="dh"><h2>'+n+'</h2><span class="muted">'+c.state+'</span><span class="tag" style="background:'+COL[c.system]+';color:#fff;border-color:'+COL[c.system]+'">'+SHORT[c.system]+'</span></div>'+
+    '<p><b style="font-weight:500;color:var(--ink)">How the tax is worked out:</b> '+c.method+'</p>'+
+    '<div class="facts"><div class="fact"><b>'+fmt(s.Core)+'</b><span>core localities, '+latest+' (per m²/yr)</span></div><div class="fact"><b>'+fmt(s.Periphery)+'</b><span>peripheral localities, '+latest+'</span></div><div class="fact"><b>'+ratio+'</b><span>core ÷ periphery</span></div><div class="fact"><b>'+c.pop2011+'</b><span>population, Census 2011</span></div><div class="fact"><b>'+c.localities+'</b><span>localities sampled</span></div><div class="fact"><b>'+ys.length+'</b><span>years with a confirmed figure</span></div></div>'+
+    '<div class="dgrid"><div><div class="sub">Tax per m² per year, by locality tier</div><div id="spark">'+spark(c)+'</div></div><div><div class="sub">By year (reference plot: '+c.plot+')</div><table><thead><tr><th>Year</th><th>Core</th><th>Middle</th><th>Periphery</th><th>n</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+    '<p style="margin-top:16px;font-size:14px;color:var(--body)">'+c.formula+'</p>';
+  drawMap();drawBars();if(window.innerWidth<900)document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'start'});}
+function render(){drawMap();drawBars();}
+function init(){kpis();chips();var st={};Object.keys(DATA).forEach(function(n){st[DATA[n].state]=1;});var sel=document.getElementById('stateSel');Object.keys(st).sort().forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+  document.getElementById('yearSel').addEventListener('change',function(e){state.year=e.target.value;render();});
+  document.getElementById('metricSel').addEventListener('change',function(e){state.metric=e.target.value;render();});
+  sel.addEventListener('change',function(e){state.state=e.target.value;render();});render();}
+Promise.all([fetch('../assets/data/vlt-cities.json').then(function(r){return r.json();}),fetch('../assets/data/india-outline.json').then(function(r){return r.json();})]).then(function(a){DATA=a[0];IND=a[1];init();}).catch(function(){document.getElementById('map').innerHTML='<p class="muted">The data could not be loaded.</p>';});
+})();
+</script>
+"""
