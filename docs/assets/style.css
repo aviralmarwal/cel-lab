@@ -122,7 +122,7 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .post-row p{font-size:15px}
 .post-row .by{font-size:13px;color:var(--muted);margin-top:6px}
 @media(max-width:520px){.post-row{grid-template-columns:1fr;gap:4px}}
-.post{max-width:70ch}
+.post{max-width:780px}
 .post .by{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
 .post h2{font-size:28px;margin:36px 0 12px}
 .post h3{font-size:22px;margin:28px 0 10px}
@@ -130,7 +130,7 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .post ul,.post ol{padding-left:22px;margin-bottom:18px}
 .post li{margin-bottom:8px}
 .post blockquote{border-left:3px solid var(--amber);padding:4px 18px;color:var(--body);font-style:italic;margin:0 0 18px}
-.post img{border-radius:3px;margin:8px 0 18px}
+.post img{width:100%;border-radius:3px;margin:8px 0 18px;border:1px solid var(--line)}
 .post code{font-family:var(--mono);font-size:14px;background:var(--mist);padding:1px 5px;border-radius:2px}
 .post pre{background:var(--ink);color:#fff;padding:16px 18px;border-radius:3px;overflow-x:auto;margin-bottom:18px}
 .post pre code{background:none;color:inherit}
