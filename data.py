@@ -359,6 +359,9 @@ PEOPLE = {
     "alumni": [  # past interns and members, newest first
         {"name": "Adarsh Singh", "affil": "B.Tech, NIT Delhi", "role": "SPARK Intern, May – July 2026", "topic": "Building the property tax database for cities in India"},
         {"name": "Anisha Kathpal", "affil": "PhD scholar, IIT Kanpur", "role": "SPARK Intern, May – July 2025", "topic": "Systematic literature review of state-led gentrification in the Global South"},
+        {"name": "Shrutikirti Dubey", "affil": "M.Arch, IIT Roorkee", "role": "IKS Research Intern, 2025", "topic": "Cities in ancient India: lessons for modern cities"},
+        {"name": "Manabi Pokharel", "affil": "M.Arch, IIT Roorkee", "role": "IKS Research Intern, 2025", "topic": "Cities in ancient India: lessons for modern cities"},
+        {"name": "Abhay Kishor", "affil": "B.Arch, IIT Roorkee", "role": "IKS Research Intern, 2025", "topic": "Cities in ancient India: lessons for modern cities"},
     ],
 }
 

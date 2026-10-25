@@ -823,7 +823,7 @@ def build_people():
     past += [{"name": t["name"], "d": f'Thesis student · {t["prog"]} · {t["year"]}', "v": t["title"]} for t in past_theses]
     alumni = "".join(f'<div class="talk"><div class="d">{e(a["d"])}</div><div><div class="t">{e(a["name"])}</div><div class="v">{e(a["v"])}</div></div></div>' for a in past)
     alumni_block = (f'<div class="eyebrow" style="margin:48px 0 6px">Past Team Members</div>'
-                    f'<p class="muted" style="font-size:14px;margin-bottom:6px">Interns hosted under the SPARK programme, IIT Roorkee, and M.Sc. / BS-MS Economics thesis students supervised at the lab.</p><div class="past">{alumni}</div>') if alumni else ""
+                    f'<p class="muted" style="font-size:14px;margin-bottom:6px">Interns hosted under the SPARK and IKS (Indian Knowledge Systems) programmes at IIT Roorkee, and M.Sc. / BS-MS Economics thesis students supervised at the lab.</p><div class="past">{alumni}</div>') if alumni else ""
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">People</div><h1>The team</h1>
