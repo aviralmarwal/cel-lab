@@ -335,7 +335,8 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
 .ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
-.ongoing strong{display:block;color:var(--ink);font-weight:500}
+.ongoing strong{display:block;color:var(--ink);font-weight:500;font-family:var(--serif);font-size:19px;margin-bottom:2px}
+.ongoing .om{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
 
 /* opportunities */
 .openings{display:grid;gap:16px;margin-bottom:40px}

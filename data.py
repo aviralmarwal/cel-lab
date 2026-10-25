@@ -210,8 +210,15 @@ PROJECTS = [
 ]
 
 # Work in progress, listed on the theme page. Keep to what you're happy to show publicly.
-ONGOING = [
-    # {"title": "Working title", "note": "One or two lines: question, data, expected output.", "theme": "urban-growth-simulation"},
+ONGOING = [  # work in progress: shown on the theme page and in "Ongoing research" on the Research page
+    {"title": "Role of State Policies in Gentrification: A Systematic Literature Review",
+     "authors": "Anisha Kathpal and Aviral Marwal",
+     "status": "Expected working paper, 2027",
+     "note": ("Gentrification is usually studied as a market process. This review asks what happens when the state is the driver: "
+              "through zoning, urban renewal, transit and green investment, heritage and tourism promotion, and housing policy. "
+              "It brings together the international literature on state-led gentrification across the Global North and South, "
+              "and asks which policies intended to limit displacement have actually worked."),
+     "theme": "housing-affordability-segregation"},
 ]
 
 EVENTS = [

@@ -304,7 +304,8 @@ DASHCSS_PLACEHOLDER
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
 .ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
-.ongoing strong{display:block;color:var(--ink);font-weight:500}
+.ongoing strong{display:block;color:var(--ink);font-weight:500;font-family:var(--serif);font-size:19px;margin-bottom:2px}
+.ongoing .om{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
 
 /* opportunities */
 .openings{display:grid;gap:16px;margin-bottom:40px}
@@ -629,14 +630,25 @@ def build_index():
 
 def build_research():
     themes = "".join(theme_card(t) for t in THEMES)
+    ongoing_sec = ""
+    if ONGOING:
+        items = "".join(ongoing_html(o).replace("</strong>", f'</strong><a class="muted" style="font-size:13px" href="research/{o["theme"]}.html">{e(THEME_BY_SLUG[o["theme"]]["title"])}</a>', 1) for o in ONGOING)
+        ongoing_sec = (f'<section class="block alt"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">Ongoing research</div><h2>Work in progress</h2></div></div>'
+                       f'<p class="muted" style="font-size:14.5px;margin:-16px 0 18px;max-width:70ch">Papers in preparation. Drafts are circulated once they are ready; write to us if you are working on related questions.</p>'
+                       f'<div class="ongoing" style="margin-top:0">{items}</div></div></section>')
     body = f"""
 <section class="page-head"><div class="wrap"><div>
   <div class="eyebrow">Research</div><h1>Seven questions about Indian cities</h1>
   <p>Our work is organised around seven themes. Each page describes what the theme is about, the issues we tackle, and the projects and publications that sit under it.</p>
 </div></div></section>
 <section class="block"><div class="wrap"><div class="grid themes">{themes}</div></div></section>
+{ongoing_sec}
 """
     return page("Research", body, "research.html")
+
+def ongoing_html(o, root=""):
+    meta = " · ".join(x for x in [e(o.get("authors", "")), e(o.get("status", ""))] if x)
+    return f'<div><strong>{e(o["title"])}</strong><span class="om">{meta}</span>{e(o["note"])}</div>'
 
 def build_theme(t):
     pubs = [p for p in ALL_PUBS if t["slug"] in p["themes"]]
@@ -649,7 +661,7 @@ def build_theme(t):
     ongoing_block = ""
     if ongoing:
         ongoing_block = ('<h2 style="font-size:26px;margin-top:40px">Work in progress</h2><div class="ongoing">' +
-                         "".join(f'<div><strong>{e(o["title"])}</strong>{e(o["note"])}</div>' for o in ongoing) + "</div>")
+                         "".join(ongoing_html(o) for o in ongoing) + "</div>")
     proj_block = ("<ul>" + "".join(f'<li><a href="../projects.html">{e(p["title"])}</a> <span class="muted">({e(p["role"])})</span></li>' for p in projs) + "</ul>") if projs else '<p class="empty">No active projects under this theme yet.</p>'
     body = f"""
 <section class="page-head"><div class="wrap">
