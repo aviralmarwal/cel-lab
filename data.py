@@ -237,6 +237,16 @@ ONGOING = [  # work in progress: shown on the theme page and in "Ongoing researc
               "approach separates towns that use their land poorly from towns that are simply the wrong size, which matters because "
               "the policy response is different in each case."),
      "theme": "land-use-optimisation"},
+    {"title": "Economic Heterogeneity and Population Distributions of Indian Cities",
+     "authors": "Nikhil Mishra and Aviral Marwal",
+     "status": "Expected working paper, 2027",
+     "note": ("Why are some Indian cities compact and others sprawling, and why does the same city change shape over time? "
+              "The paper argues that the answer lies in what a city's economy does. Using establishment-level employment from the "
+              "Economic Censuses of 1990, 1998 and 2013, it builds seven indices of the character of each city's economy, such as how "
+              "tradable, skilled, capital-intensive or centralised its activities are, and relates them to the population density "
+              "gradient measured from the Global Human Settlement Layer, asking whether shifts in a city's economic make-up can "
+              "explain shifts in where its people live."),
+     "theme": "industrial-agglomeration-growth"},
 ]
 
 EVENTS = [
