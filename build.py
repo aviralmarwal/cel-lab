@@ -63,7 +63,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-heigh
 }
 
 /* hero */
-.hero{padding-block:72px 56px;border-bottom:1px solid var(--line);background:var(--paper)}
+.hero{padding-block:56px 48px;border-bottom:1px solid var(--line);background:var(--paper)}
 .hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
 .hero h1{font-size:clamp(38px,5vw,60px);margin:14px 0 20px}
 .hero h1 em{font-style:italic;color:var(--teal)}
@@ -71,6 +71,35 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-heigh
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
 .hero-art{aspect-ratio:1/1;max-width:420px;justify-self:end;width:100%}
 @media(max-width:820px){.hero .wrap{grid-template-columns:1fr;gap:32px}.hero-art{max-width:300px;justify-self:start}.hero{padding-block:44px 40px}}
+
+/* home: theme strip + two columns */
+.strip{padding-block:28px 32px;border-bottom:1px solid var(--line)}
+.strip-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+.strip-head .more{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.tiles{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
+.tile{display:flex;flex-direction:column;gap:8px;color:var(--ink);font-size:13px;line-height:1.3}
+.tile:hover{text-decoration:none;color:var(--teal)}
+.tile .tthumb{aspect-ratio:3/2;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--paper)}
+.tile .tthumb svg{width:100%;height:100%;display:block}
+@media(max-width:1000px){.tiles{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.home-cols{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;align-items:start}
+@media(max-width:900px){.home-cols{grid-template-columns:1fr;gap:40px}}
+.lead-post{display:block;background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;color:inherit}
+.lead-post:hover{text-decoration:none}
+.lead-post img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.lp-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:8px}
+.lp-body h3{font-size:26px}
+.lead-post:hover h3{color:var(--teal)}
+.lp-body p{font-size:15px}
+ul.mini{list-style:none;margin:14px 0 10px;display:grid;gap:0}
+ul.mini li{padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.45}
+ul.mini li a{color:var(--ink);display:block}
+ul.mini li a:hover{color:var(--teal);text-decoration:none}
+ul.mini li span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.side-block{margin-bottom:34px}
+.side-block h3{font-size:19px;padding-bottom:8px;border-bottom:2px solid var(--navy)}
+.side-block .more{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
 
 /* page header (inner pages) */
 .page-head{padding-block:56px 40px;border-bottom:1px solid var(--line);background:var(--paper)}
@@ -594,20 +623,24 @@ def event_html(ev, root=""):
 
 # ───────────────────────── Pages ─────────────────────────
 def build_index():
-    themes = "".join(theme_card(t) for t in THEMES)
-    projects = "".join(pcard(p) for p in PROJECTS[:4])
-    recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
-    news = "".join(f'<div class="news"><div class="kind">{e(n["date_text"])}</div><p style="font-size:15px;color:var(--ink)">{e(n["text"])}</p>'
-                   f'<p style="margin-top:8px"><a href="{n["link"]}" class="eyebrow">Read more →</a></p></div>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
-    ongoing_strip = ""
-    if ONGOING:
-        items = "".join(f'<div class="wip"><div class="eyebrow amber">{e(THEME_BY_SLUG[o["theme"]]["title"])}</div><h3>{e(o["title"])}</h3>'
-                        f'<div class="om">{e(o.get("authors",""))} · {e(o.get("status",""))}</div><p>{e(o["note"])}</p><a href="research/{o["theme"]}.html" class="cta">On the theme page →</a></div>' for o in ONGOING)
-        ongoing_strip = (f'<section class="block alt"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">Ongoing research</div><h2>Work in progress</h2></div><a class="more" href="research.html#ongoing">All ongoing work →</a></div>'
-                         f'<div class="grid wips">{items}</div></div></section>')
     posts = load_posts()
-    blog_strip = (f'<section class="block"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">{e(BLOG["label"])}</div><h2>From the blog</h2></div><a class="more" href="blog.html">All posts →</a></div>'
-                  f'<div class="grid posts">{"".join(post_card(p) for p in posts[:3])}</div></div></section>') if posts else ""
+    # compact theme strip
+    tiles = "".join(f'<a class="tile" href="research/{t["slug"]}.html"><div class="tthumb">{THUMBS[t["slug"]]()}</div><span>{e(t["title"])}</span></a>' for t in THEMES)
+    # latest writing (left column)
+    if posts:
+        f = posts[0]
+        lead = (f'<a class="lead-post" href="blog/{f["slug"]}.html">' + (f'<img src="{f["image"]}" alt="">' if f["image"] else "") +
+                f'<div class="lp-body"><div class="pmeta"><span class="tagc">{e(BLOG["label"])}</span><span>{e(nice_date(f["date"]))}</span><span>{f["minutes"]} min read</span></div>'
+                f'<h3>{e(f["title"])}</h3><p>{e(f["summary"])}</p></div></a>')
+        others = "".join(f'<li><a href="blog/{p["slug"]}.html">{e(p["title"])}</a><span>{e(nice_date(p["date"]))}</span></li>' for p in posts[1:4])
+        writing = lead + (f'<ul class="mini">{others}</ul>' if others else "")
+    else:
+        writing = '<p class="muted">No posts yet.</p>'
+    # right column: activity lists
+    wip = "".join(f'<li><a href="research/{o["theme"]}.html">{e(o["title"])}</a><span>{e(o.get("authors",""))}</span></li>' for o in ONGOING[:4])
+    proj = "".join(f'<li><a href="projects.html">{e(p["title"])}</a><span>{e(p.get("role",""))}' + (f' · {e(p["funder"])}' if p.get("funder") else (f' · with {e(p["partner"])}' if p.get("partner") else "")) + '</span></li>' for p in [q for q in PROJECTS if q.get("status","ongoing")=="ongoing"][:3])
+    news = "".join(f'<li><a href="{n["link"]}">{e(n["text"])}</a><span>{e(n["date_text"])}</span></li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
+    recent = "".join(f'<li><a href="{p["url"] or "publications.html"}"{" target=\"_blank\" rel=\"noopener\"" if p["url"] else ""}>{e(p["title"])}</a><span>{e(p["venue"])}, {p["year"]}</span></li>' for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
     body = f"""
 <section class="hero"><div class="wrap">
   <div>
@@ -619,26 +652,22 @@ def build_index():
   <div class="hero-art">{hero_art()}</div>
 </div></section>
 
-<section class="block"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Research</div><h2>What we work on</h2></div><a class="more" href="research.html">All themes →</a></div>
-  <div class="grid themes">{themes}</div>
+<section class="strip"><div class="wrap">
+  <div class="strip-head"><span class="eyebrow">Seven research themes</span><a class="more" href="research.html">About our research →</a></div>
+  <div class="tiles">{tiles}</div>
 </div></section>
 
-<section class="block"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Projects</div><h2>Current projects</h2></div><a class="more" href="projects.html">Project details →</a></div>
-  <div class="grid projects">{projects}</div>
-</div></section>
-
-<section class="block"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Publications</div><h2>Recent publications</h2></div><a class="more" href="publications.html">All publications →</a></div>
-  <div class="pub-list">{recent}</div>
-</div></section>
-
-{ongoing_strip}
-{blog_strip}
-<section class="block alt"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">News</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All news &amp; talks →</a></div>
-  <div class="news-strip">{news}</div>
+<section class="block"><div class="wrap home-cols">
+  <div class="col-main">
+    <div class="sec-head"><div><div class="eyebrow">Latest writing</div><h2>From the blog</h2></div><a class="more" href="blog.html">All posts →</a></div>
+    {writing}
+  </div>
+  <aside class="col-side">
+    <div class="side-block"><h3>Work in progress</h3><ul class="mini">{wip}</ul><a class="more" href="research.html#ongoing">All ongoing work →</a></div>
+    <div class="side-block"><h3>Projects</h3><ul class="mini">{proj}</ul><a class="more" href="projects.html">Project details →</a></div>
+    <div class="side-block"><h3>Recent publications</h3><ul class="mini">{recent}</ul><a class="more" href="publications.html">All publications →</a></div>
+    <div class="side-block"><h3>News</h3><ul class="mini">{news}</ul><a class="more" href="events.html">News &amp; talks →</a></div>
+  </aside>
 </div></section>
 """
     return page("Home", body, "index.html")
