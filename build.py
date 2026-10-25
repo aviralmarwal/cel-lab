@@ -178,6 +178,10 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .post pre{background:var(--ink);color:#fff;padding:16px 18px;border-radius:3px;overflow-x:auto;margin-bottom:18px}
 .post pre code{background:none;color:inherit}
 .post hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+.post table{width:100%;max-width:480px;border-collapse:collapse;margin:8px 0 26px;font-size:15.5px;font-variant-numeric:tabular-nums}
+.post th,.post td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+.post th{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;border-bottom:2px solid var(--navy)}
+.post td:last-child,.post th:last-child{text-align:right}
 .post .note{font-size:14.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 .keybox{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:3px;padding:20px 24px 8px;margin:8px 0 36px}
 .keybox .kh{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
