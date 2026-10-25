@@ -219,6 +219,15 @@ ONGOING = [  # work in progress: shown on the theme page and in "Ongoing researc
               "It brings together the international literature on state-led gentrification across the Global North and South, "
               "and asks which policies intended to limit displacement have actually worked."),
      "theme": "housing-affordability-segregation"},
+    {"title": "City-Scale Slum Formation Using Agent-Based Modelling",
+     "authors": "Shraman Joardar and Aviral Marwal",
+     "status": "Expected working paper, 2027",
+     "note": ("Why do slums form where they do? The paper builds an agent-based model in which thousands of households of different "
+              "incomes search for housing across a city, trading rent against commuting cost, tiring of the search, and doubling up "
+              "when nothing affordable remains. Informal, multi-family clusters emerge from these decisions rather than being assumed, "
+              "and the model is used as a testbed for housing and transport policy, beginning with the effect of cheaper public transport "
+              "on where poor households can afford to live."),
+     "theme": "housing-affordability-segregation"},
 ]
 
 EVENTS = [
