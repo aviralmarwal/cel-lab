@@ -301,6 +301,14 @@ DASHCSS_PLACEHOLDER
 .course p{font-size:15px}
 @media(max-width:520px){.course{grid-template-columns:1fr;gap:8px}}
 
+/* ongoing (home) */
+.grid.wips{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+.wip{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 24px;display:flex;flex-direction:column;gap:8px}
+.wip h3{font-size:21px}
+.wip .om{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wip p{font-size:14.5px}
+.wip .cta{margin-top:auto;padding-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
 .ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
@@ -591,6 +599,12 @@ def build_index():
     recent = "".join(pub_html(p) for p in sorted(ALL_PUBS, key=lambda p: -p["year"])[:3])
     news = "".join(f'<div class="news"><div class="kind">{e(n["date_text"])}</div><p style="font-size:15px;color:var(--ink)">{e(n["text"])}</p>'
                    f'<p style="margin-top:8px"><a href="{n["link"]}" class="eyebrow">Read more →</a></p></div>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
+    ongoing_strip = ""
+    if ONGOING:
+        items = "".join(f'<div class="wip"><div class="eyebrow amber">{e(THEME_BY_SLUG[o["theme"]]["title"])}</div><h3>{e(o["title"])}</h3>'
+                        f'<div class="om">{e(o.get("authors",""))} · {e(o.get("status",""))}</div><p>{e(o["note"])}</p><a href="research/{o["theme"]}.html" class="cta">On the theme page →</a></div>' for o in ONGOING)
+        ongoing_strip = (f'<section class="block alt"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">Ongoing research</div><h2>Work in progress</h2></div><a class="more" href="research.html#ongoing">All ongoing work →</a></div>'
+                         f'<div class="grid wips">{items}</div></div></section>')
     posts = load_posts()
     blog_strip = (f'<section class="block"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">{e(BLOG["label"])}</div><h2>From the blog</h2></div><a class="more" href="blog.html">All posts →</a></div>'
                   f'<div class="grid posts">{"".join(post_card(p) for p in posts[:3])}</div></div></section>') if posts else ""
@@ -610,7 +624,7 @@ def build_index():
   <div class="grid themes">{themes}</div>
 </div></section>
 
-<section class="block alt"><div class="wrap">
+<section class="block"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Projects</div><h2>Current projects</h2></div><a class="more" href="projects.html">Project details →</a></div>
   <div class="grid projects">{projects}</div>
 </div></section>
@@ -620,6 +634,7 @@ def build_index():
   <div class="pub-list">{recent}</div>
 </div></section>
 
+{ongoing_strip}
 {blog_strip}
 <section class="block alt"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">News</div><h2>Latest from the lab</h2></div><a class="more" href="events.html">All news &amp; talks →</a></div>
@@ -633,7 +648,7 @@ def build_research():
     ongoing_sec = ""
     if ONGOING:
         items = "".join(ongoing_html(o).replace("</strong>", f'</strong><a class="muted" style="font-size:13px" href="research/{o["theme"]}.html">{e(THEME_BY_SLUG[o["theme"]]["title"])}</a>', 1) for o in ONGOING)
-        ongoing_sec = (f'<section class="block alt"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">Ongoing research</div><h2>Work in progress</h2></div></div>'
+        ongoing_sec = (f'<section class="block alt" id="ongoing"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">Ongoing research</div><h2>Work in progress</h2></div></div>'
                        f'<p class="muted" style="font-size:14.5px;margin:-16px 0 18px;max-width:70ch">Papers in preparation. Drafts are circulated once they are ready; write to us if you are working on related questions.</p>'
                        f'<div class="ongoing" style="margin-top:0">{items}</div></div></section>')
     body = f"""

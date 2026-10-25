@@ -332,6 +332,14 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .course p{font-size:15px}
 @media(max-width:520px){.course{grid-template-columns:1fr;gap:8px}}
 
+/* ongoing (home) */
+.grid.wips{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+.wip{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:22px 24px;display:flex;flex-direction:column;gap:8px}
+.wip h3{font-size:21px}
+.wip .om{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wip p{font-size:14.5px}
+.wip .cta{margin-top:auto;padding-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+
 /* ongoing */
 .ongoing{display:grid;gap:12px;margin-top:16px}
 .ongoing div{padding:14px 18px;background:var(--cream);border:1px dashed var(--line);border-radius:2px;font-size:15px}
