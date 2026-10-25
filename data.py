@@ -340,10 +340,10 @@ OPPORTUNITIES = {
         {"title": "PhD students (1–2 positions)",
          "note": ("The lab is looking for one or two PhD students to join from the next admission cycle, to work on urban economics "
                   "and policy in Indian cities: land and property taxation, urban growth and sprawl, housing and accessibility, or "
-                  "agent-based and spatial modelling of cities. A background in economics, planning, geography or data science and "
+                  "agent-based and spatial modelling of cities. A background in economics, public policy, planning or data science and "
                   "comfort with quantitative work are expected; experience with GIS, R or Python is an advantage. Admission is "
                   "through the IIT Roorkee PhD programme in the Department of Humanities and Social Sciences. Before applying, "
-                  "write to Dr. Aviral Marwal with a CV and a short note on the questions you would like to work on."),
+                  "write to us with a CV and a short note on the questions you would like to work on."),
          "deadline": ""},
     ],
     "standing": (
