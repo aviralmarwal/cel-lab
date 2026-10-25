@@ -232,7 +232,7 @@ ONGOING = [  # work in progress: shown on the theme page and in "Ongoing researc
      "authors": "Ankita Dey and Aviral Marwal",
      "status": "Expected working paper, 2027",
      "note": ("How well do Indian towns use the land they have built on? The paper measures urban land use efficiency for 126 towns "
-              "across 25 states over two decades, treating built-up land as the input and asking how much population and economic "
+              "across 25 states in 2001, 2011 and 2021 (the last year using population projections), treating built-up land as the input and asking how much population and economic "
               "output it supports while keeping down what nobody wants: air pollution and slum populations. A slacks-based DEA "
               "approach separates towns that use their land poorly from towns that are simply the wrong size, which matters because "
               "the policy response is different in each case."),
