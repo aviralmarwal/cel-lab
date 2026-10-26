@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>District urban hierarchy explorer · CEL Lab, IIT Roorkee</title>
+<meta name="description" content="Zipf&#x27;s exponent for the towns in 415 Indian districts: how top-heavy is each district&#x27;s urban system?">
+<meta property="og:title" content="District urban hierarchy explorer · CEL Lab">
+<meta property="og:description" content="Zipf&#x27;s exponent for the towns in 415 Indian districts: how top-heavy is each district&#x27;s urban system?">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="../index.html"><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span><span class="brand-text"><strong>CEL Lab</strong>IIT Roorkee</span></a>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
+  <ul class="links" id="navLinks"><li><a href="../index.html">Home</a></li><li><a href="../research.html">Research</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../people.html">People</a></li><li><a href="../publications.html">Publications</a></li><li><a href="../events.html">News</a></li><li><a href="../teaching.html">Teaching</a></li><li><a href="../blog.html">Blog</a></li><li><a href="../data.html" class="active">Data</a></li><li><a href="../opportunities.html">Join us</a></li><li><a href="../contact.html">Contact</a></li></ul>
+</div></header>
+<main>
+
+<section class="page-head"><div class="wrap"><div>
+  <div class="eyebrow"><a href="../data.html">Data &amp; visuals</a> / Explorer</div>
+  <h1>District urban hierarchy explorer</h1>
+  <p>For 415 Indian districts, how top-heavy is the system of towns? The Zipf exponent <em>b</em> is 1 when town sizes follow Zipf's law, higher when one town dominates, lower when towns are of similar size. Search a district, or browse by state.</p>
+</div></div></section>
+<section class="block"><div class="wrap">
+  <div class="kpis" id="zxKpis"></div>
+  <div class="ctrls">
+    <div class="ctrl" style="flex:1;min-width:240px"><label for="zxQ">Find a district</label><div class="zx-search"><input id="zxQ" type="search" placeholder="Type a district name, e.g. Malappuram" autocomplete="off"><div class="zx-sugg" id="zxSugg"></div></div></div>
+    <div class="ctrl"><label for="zxState">State</label><select id="zxState"><option value="">All states</option></select></div>
+    <div class="ctrl"><label for="zxMinN">Minimum towns</label><select id="zxMinN"><option value="6">6 or more</option><option value="10">10 or more</option><option value="20">20 or more</option></select></div>
+  </div>
+  <div class="zx-top">
+    <div class="panel zx-detail" id="zxDetail"><p class="muted">Pick a district to see its hierarchy, how it compares, and its fitted rank–size line.</p></div>
+    <div class="panel"><h3 id="zxFTitle">Rank–size fingerprint</h3><div class="sub" id="zxFSub">Fitted line; largest town = 100; log scales</div><div id="zxFinger"></div></div>
+  </div>
+  <div class="panel" style="margin-top:22px"><h3 id="zxTTitle">All districts</h3><div class="sub">Click a column to sort; click a row to select.</div>
+    <div class="zx-wrap"><table class="zx-table"><thead><tr><th data-k="d">District</th><th data-k="s">State</th><th data-k="b" class="on">b</th><th data-k="n">Towns</th><th data-k="pop">Urban pop. 2011</th><th data-k="r2">R²</th></tr></thead><tbody id="zxBody"></tbody></table></div>
+    <div class="zx-more"><button type="button" class="btn" id="zxMore">Show more</button></div>
+  </div>
+  <p class="dnote">Towns and populations from the SHRUG database (Development Data Lab), harmonised to Census 2011. <em>b</em> is estimated by least squares on log population against log rank for districts with at least six towns; districts with fewer towns, including most single-city districts, are not included. Estimates with R² below 0.8 should be read with care. Analysis by Ankita Dey and Nikhil Mishra, CEL Lab. See the post <a href="../blog/one-big-town-or-many-small-ones.html">One big town, or many small ones?</a></p>
+</div></section>
+<script>
+(function(){
+var D=null,view=[],sortK='b',sortDir=-1,sel=null,shown=40;
+var $=function(id){return document.getElementById(id);};
+function fmtPop(v){return v.toLocaleString('en-IN');}
+function verdict(b){if(b>=1.6)return 'Strongly top-heavy: one town dominates and the rest fall away quickly.';if(b>=1.2)return 'Top-heavy: the largest town is well ahead of the others.';if(b>=0.9)return 'Close to Zipf\'s law: sizes fall roughly in proportion to rank.';if(b>=0.7)return 'Fairly even: towns of broadly similar size, no clear capital.';return 'Very even: many towns of similar size and no dominant centre.';}
+function pct(arr,v){var n=arr.filter(function(x){return x<v;}).length;return Math.round(100*n/arr.length);}
+function gauge(b,allB,stB){var W=420,H=64,l=10,r=10;var lo=0.3,hi=2.8;function X(v){return l+(Math.min(Math.max(v,lo),hi)-lo)/(hi-lo)*(W-l-r);}
+  var s='<svg viewBox="0 0 '+W+' '+H+'">';
+  s+='<rect x="'+l+'" y="26" width="'+(W-l-r)+'" height="6" rx="3" fill="#e6e0d6"/>';
+  allB.forEach(function(v){s+='<rect x="'+X(v).toFixed(1)+'" y="22" width="1.5" height="14" fill="#1a3a5c" opacity=".12"/>';});
+  stB.forEach(function(v){s+='<rect x="'+X(v).toFixed(1)+'" y="20" width="2" height="18" fill="#0e7c7b" opacity=".6"/>';});
+  s+='<line x1="'+X(1)+'" y1="14" x2="'+X(1)+'" y2="44" stroke="#d9901a" stroke-width="1.5"/><text x="'+X(1)+'" y="56" font-size="10" fill="#d9901a" text-anchor="middle" font-family="Outfit,sans-serif">Zipf (b = 1)</text>';
+  s+='<circle cx="'+X(b).toFixed(1)+'" cy="29" r="8" fill="#1a3a5c" stroke="#fff" stroke-width="2"/>';
+  s+='<text x="'+l+'" y="12" font-size="10" fill="#737b84" font-family="Outfit,sans-serif">even</text><text x="'+(W-r)+'" y="12" font-size="10" fill="#737b84" text-anchor="end" font-family="Outfit,sans-serif">top-heavy</text>';
+  return s+'</svg>';}
+function finger(x){var W=440,H=300,ox=44,oy=16,cw=W-ox-12,ch=H-oy-40;var N=x.n,b=x.b;
+  function px(rk){return ox+(Math.log10(rk)/Math.log10(Math.max(N,10)))*(cw-10)+5;}function py(sz){return oy+((2-Math.log10(Math.max(sz,0.1)))/3)*(ch-10)+5;}
+  var s='<svg viewBox="0 0 '+W+' '+H+'"><rect x="'+ox+'" y="'+oy+'" width="'+cw+'" height="'+ch+'" fill="#f7f4ee" stroke="#e6e0d6"/>';
+  [100,10,1,0.1].forEach(function(v){s+='<line x1="'+ox+'" y1="'+py(v).toFixed(1)+'" x2="'+(ox+cw)+'" y2="'+py(v).toFixed(1)+'" stroke="#e6e0d6" stroke-dasharray="2 3"/><text x="'+(ox-6)+'" y="'+(py(v)+4).toFixed(1)+'" font-size="10" fill="#737b84" text-anchor="end" font-family="Outfit,sans-serif">'+v+'</text>';});
+  [1,2,5,10,20,50,100].filter(function(r){return r<=N;}).forEach(function(r){s+='<text x="'+px(r).toFixed(1)+'" y="'+(oy+ch+16)+'" font-size="10" fill="#737b84" text-anchor="middle" font-family="Outfit,sans-serif">'+r+'</text>';});
+  // zipf reference (b=1)
+  var ref='';for(var r=1;r<=N;r++){ref+=(r===1?'M':' L')+px(r).toFixed(1)+' '+py(100/r).toFixed(1);}
+  s+='<path d="'+ref+'" fill="none" stroke="#d9901a" stroke-width="1.5" stroke-dasharray="4 4"/>';
+  var d='';for(var r2=1;r2<=N;r2++){d+=(r2===1?'M':' L')+px(r2).toFixed(1)+' '+py(100*Math.pow(r2,-b)).toFixed(1);}
+  s+='<path d="'+d+'" fill="none" stroke="#0e7c7b" stroke-width="2.5"/>';
+  for(var r3=1;r3<=Math.min(N,40);r3++){s+='<circle cx="'+px(r3).toFixed(1)+'" cy="'+py(100*Math.pow(r3,-b)).toFixed(1)+'" r="2.8" fill="#1a3a5c"/>';}
+  s+='<text x="'+(ox+cw/2)+'" y="'+(H-4)+'" font-size="11" fill="#3d4752" text-anchor="middle" font-family="Outfit,sans-serif">rank of town (log)</text>';
+  s+='<text x="'+(ox+10)+'" y="'+(oy+ch-24)+'" font-size="10.5" fill="#0e7c7b" font-family="Outfit,sans-serif">— fitted, b = '+b.toFixed(2)+'</text><text x="'+(ox+10)+'" y="'+(oy+ch-10)+'" font-size="10.5" fill="#d9901a" font-family="Outfit,sans-serif">- - Zipf reference, b = 1</text>';
+  return s+'</svg>';}
+function select(x){sel=x;var allB=D.map(function(y){return y.b;});var st=D.filter(function(y){return y.s===x.s;});var stB=st.map(function(y){return y.b;});
+  var rankNat=D.filter(function(y){return y.b>x.b;}).length+1,rankSt=st.filter(function(y){return y.b>x.b;}).length+1;
+  var size2=(100*Math.pow(2,-x.b)).toFixed(0);
+  $('zxDetail').innerHTML='<div class="eyebrow">'+x.s+'</div><h2 style="font-size:34px;margin:4px 0 10px">'+x.d+'</h2>'+
+   '<div class="big"><b>'+x.b.toFixed(2)+'</b><div class="verdict">'+verdict(x.b)+'</div></div>'+
+   '<div class="zx-gauge">'+gauge(x.b,allB,stB)+'</div>'+
+   '<p class="muted" style="font-size:12.5px">Dot: this district. Teal ticks: other districts in '+x.s+'. Grey: all 415 districts.</p>'+
+   '<div class="zx-facts"><div><b>'+x.n+'</b><span>towns in the fit</span></div><div><b>'+fmtPop(x.pop)+'</b><span>urban population, 2011</span></div><div><b>'+rankSt+' of '+st.length+'</b><span>most top-heavy in state</span></div><div><b>'+rankNat+' of '+D.length+'</b><span>most top-heavy in India</span></div><div><b>'+size2+'%</b><span>second town\'s size vs the largest, on the fitted line</span></div><div><b>'+x.r2.toFixed(2)+'</b><span>R² of the fit'+(x.r2<0.8?' (read with care)':'')+'</span></div></div>';
+  $('zxFTitle').textContent='Rank–size fingerprint: '+x.d;$('zxFinger').innerHTML=finger(x);
+  $('zxQ').value=x.d;renderTable();if(window.innerWidth<900)$('zxDetail').scrollIntoView({behavior:'smooth',block:'start'});}
+function applyFilter(){var st=$('zxState').value,mn=+$('zxMinN').value;view=D.filter(function(x){return (!st||x.s===st)&&x.n>=mn;});
+  view.sort(function(a,b){var va=a[sortK],vb=b[sortK];if(typeof va==='string')return va.localeCompare(vb)*sortDir;return (va-vb)*sortDir;});shown=40;renderTable();
+  $('zxTTitle').textContent=(st||'All districts')+' · '+view.length+' districts';}
+function renderTable(){var maxB=2.8;var rows=view.slice(0,shown).map(function(x){return '<tr data-d="'+x.d+'|'+x.s+'"'+(sel&&sel.d===x.d&&sel.s===x.s?' class="sel"':'')+'><td>'+x.d+'</td><td>'+x.s+'</td><td><span class="zx-bar" style="width:'+Math.round(Math.min(x.b,maxB)/maxB*90)+'px"></span>'+x.b.toFixed(2)+'</td><td>'+x.n+'</td><td>'+fmtPop(x.pop)+'</td><td>'+x.r2.toFixed(2)+'</td></tr>';}).join('');
+  $('zxBody').innerHTML=rows;$('zxMore').style.display=shown<view.length?'':'none';
+  $('zxBody').querySelectorAll('tr').forEach(function(tr){tr.addEventListener('click',function(){var k=tr.dataset.d.split('|');var x=D.find(function(y){return y.d===k[0]&&y.s===k[1];});if(x)select(x);});});}
+function kpis(){var bs=D.map(function(x){return x.b;}).sort(function(a,b){return a-b;});var med=bs[Math.floor(bs.length/2)];var near=D.filter(function(x){return x.b>=0.9&&x.b<=1.1;}).length;var states={};D.forEach(function(x){states[x.s]=1;});
+  $('zxKpis').innerHTML=[[D.length,'districts'],[Object.keys(states).length,'states & UTs'],[med.toFixed(2),'median b'],[near,'districts within 0.1 of Zipf'],[bs[0].toFixed(2)+' – '+bs[bs.length-1].toFixed(2),'range of b']].map(function(k){return '<div class="kpi"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('');}
+function init(){kpis();var st={};D.forEach(function(x){st[x.s]=1;});var sel_=$('zxState');Object.keys(st).sort().forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;sel_.appendChild(o);});
+  sel_.addEventListener('change',applyFilter);$('zxMinN').addEventListener('change',applyFilter);$('zxMore').addEventListener('click',function(){shown+=40;renderTable();});
+  document.querySelectorAll('.zx-table th').forEach(function(th){th.addEventListener('click',function(){var k=th.dataset.k;if(sortK===k)sortDir=-sortDir;else{sortK=k;sortDir=(k==='d'||k==='s')?1:-1;}document.querySelectorAll('.zx-table th').forEach(function(t){t.classList.toggle('on',t===th);});applyFilter();});});
+  var q=$('zxQ'),sg=$('zxSugg'),cur=-1;
+  q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();cur=-1;if(v.length<2){sg.style.display='none';return;}var m=D.filter(function(x){return x.d.toLowerCase().indexOf(v)===0||x.d.toLowerCase().indexOf(' '+v)>-1||x.s.toLowerCase().indexOf(v)===0;}).slice(0,10);
+    sg.innerHTML=m.map(function(x){return '<div data-d="'+x.d+'|'+x.s+'">'+x.d+'<span>'+x.s+' · b '+x.b.toFixed(2)+'</span></div>';}).join('');sg.style.display=m.length?'block':'none';
+    sg.querySelectorAll('div').forEach(function(el){el.addEventListener('mousedown',function(ev){ev.preventDefault();var k=el.dataset.d.split('|');var x=D.find(function(y){return y.d===k[0]&&y.s===k[1];});sg.style.display='none';if(x)select(x);});});});
+  q.addEventListener('keydown',function(ev){var items=sg.querySelectorAll('div');if(!items.length)return;if(ev.key==='ArrowDown'){cur=Math.min(cur+1,items.length-1);}else if(ev.key==='ArrowUp'){cur=Math.max(cur-1,0);}else if(ev.key==='Enter'){ev.preventDefault();(items[cur>=0?cur:0]).dispatchEvent(new MouseEvent('mousedown'));return;}else if(ev.key==='Escape'){sg.style.display='none';return;}else return;ev.preventDefault();items.forEach(function(it,i){it.classList.toggle('on',i===cur);});});
+  q.addEventListener('blur',function(){setTimeout(function(){sg.style.display='none';},150);});
+  applyFilter();var h=decodeURIComponent((location.hash||'').slice(1));var start=D.find(function(x){return x.d.toLowerCase()===h.toLowerCase();})||D.find(function(x){return x.d==='Malappuram';});if(start)select(start);}
+fetch('../assets/data/district-zipf.json').then(function(r){return r.json();}).then(function(j){D=j;init();}).catch(function(){$('zxDetail').innerHTML='<p class="muted">The data could not be loaded.</p>';});
+})();
+</script>
+
+</main>
+<footer><div class="wrap">
+  <div><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span></div>
+  <div>City Experimentation and Learning Lab · IIT Roorkee</div>
+  <div>© 2026 CEL Lab</div>
+</div></footer>
+<script>
+(function(){var b=document.getElementById('menuBtn'),l=document.getElementById('navLinks');
+b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'Close':'Menu';});})();
+</script>
+</body>
+</html>

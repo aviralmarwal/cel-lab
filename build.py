@@ -2,7 +2,7 @@
 """Builds the CEL Lab static site into ./docs (served by GitHub Pages) from data.py. Run: python3 build.py"""
 import os, shutil, html, math, random, re, glob, datetime
 import markdown
-import dashboard_vlt
+import dashboard_vlt, dashboard_zipf
 from data import LAB, THEMES, PROJECTS, PEOPLE, PUBLICATIONS, ONGOING, EVENTS, OPPORTUNITIES, TALKS, CONFERENCES, NEWS, TEACHING, THESES, BLOG
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
@@ -1028,6 +1028,11 @@ DATA_ITEMS = [
     {"kind": "Interactive dashboard", "title": "Vacant land tax across Indian cities", "href": "data/vlt-dashboard.html",
      "thumb": "assets/blog/cover-plot-empty.jpg",
      "desc": "38 cities, 16 states, 2011–2025. Map, ranking and city-by-city formulas for what it costs to hold a residential plot empty."},
+    {"kind": "Interactive explorer", "title": "District urban hierarchy explorer", "href": "data/district-hierarchy.html",
+     "thumb": "assets/blog/cover-zipf.jpg",
+     "desc": "Zipf's exponent for the towns in 415 districts: search any district, see how top-heavy its urban system is, and compare it with its state and the country."},
+    {"kind": "Data story", "title": "One big town, or many small ones?", "href": "blog/one-big-town-or-many-small-ones.html",
+     "thumb": "assets/blog/zipf-by-state.svg", "desc": "District-level urban hierarchy by state: Kerala and Tamil Nadu flat, Bihar, Haryana and Gujarat top-heavy."},
     {"kind": "Data story", "title": "What does it cost to leave a plot empty in India?", "href": "blog/what-it-costs-to-leave-a-plot-empty.html",
      "thumb": "assets/blog/vlt-38-cities-2025.svg", "desc": "A 400-fold spread in the holding cost of the same plot, and the four tax designs behind it."},
     {"kind": "Data story", "title": "The frozen tax", "href": "blog/the-frozen-tax.html",
@@ -1047,6 +1052,10 @@ def build_data_index():
 <section class="block"><div class="wrap"><div class="grid themes ds-grid">{cards}</div></div></section>
 """
     return page("Data & Visuals", body, "data.html")
+
+def build_zipf_explorer():
+    return page("District urban hierarchy explorer", dashboard_zipf.BODY, "data.html", depth=1,
+                desc="Zipf's exponent for the towns in 415 Indian districts: how top-heavy is each district's urban system?")
 
 def build_vlt_dashboard():
     return page("Vacant land tax dashboard", dashboard_vlt.BODY, "data.html", depth=1,
@@ -1112,7 +1121,7 @@ def main():
     shutil.rmtree(OUT, ignore_errors=True)
     os.makedirs(os.path.join(OUT, "assets")); os.makedirs(os.path.join(OUT, "research")); os.makedirs(os.path.join(OUT, "blog")); os.makedirs(os.path.join(OUT, "data"))
     w = lambda rel, s: open(os.path.join(OUT, rel), "w", encoding="utf-8").write(s)
-    w("assets/style.css", CSS.replace('DASHCSS_PLACEHOLDER', dashboard_vlt.CSS).strip() + "\n")
+    w("assets/style.css", CSS.replace('DASHCSS_PLACEHOLDER', dashboard_vlt.CSS + dashboard_zipf.CSS).strip() + "\n")
     w("assets/favicon.svg", FAVICON)
     w("index.html", build_index()); w("research.html", build_research()); w("projects.html", build_projects())
     w("people.html", build_people()); w("publications.html", build_publications()); w("contact.html", build_contact())
@@ -1121,7 +1130,7 @@ def main():
     if os.path.isdir(src_assets):
         shutil.copytree(src_assets, os.path.join(OUT, "assets"), dirs_exist_ok=True)
     for t in THEMES: w(f"research/{t['slug']}.html", build_theme(t))
-    w("data.html", build_data_index()); w("data/vlt-dashboard.html", build_vlt_dashboard())
+    w("data.html", build_data_index()); w("data/vlt-dashboard.html", build_vlt_dashboard()); w("data/district-hierarchy.html", build_zipf_explorer())
     posts = load_posts(); w("blog.html", build_blog(posts))
     for p in posts: w(f"blog/{p['slug']}.html", build_post(p, posts))
     if LAB.get("cname_live"): w("CNAME", LAB["domain"] + "\n")  # only once DNS for the domain points at GitHub
