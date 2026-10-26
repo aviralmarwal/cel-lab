@@ -8,6 +8,7 @@ CSS = r"""
 #zxMap path.nd{fill:#e9e4da;cursor:default}
 #zxMap path:hover{stroke:#16222e;stroke-width:1.2}
 #zxMap path.sel{stroke:#16222e;stroke-width:1.6}
+#zxMap path.stl{fill:none;stroke:#16222e;stroke-width:.7;pointer-events:none;opacity:.55}
 .zx-legend{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
 .zx-legend .ramp{display:flex}
 .zx-legend .ramp i{width:26px;height:12px;display:inline-block}
@@ -67,7 +68,7 @@ BODY = r"""
     <div class="zx-wrap"><table class="zx-table"><thead><tr><th data-k="d">District</th><th data-k="s">State</th><th data-k="b" class="on">b</th><th data-k="n">Towns</th><th data-k="pop">Urban pop. 2011</th><th data-k="r2">R²</th></tr></thead><tbody id="zxBody"></tbody></table></div>
     <div class="zx-more"><button type="button" class="btn" id="zxMore">Show more</button></div>
   </div>
-  <p class="dnote">Map boundaries are current districts (© OpenStreetMap contributors, via vardhan-maps, aligned to the Government of India depiction); each is coloured by the 2011 district it belonged to, so districts created since 2011 carry their parent's value. Towns and populations from the SHRUG database (Development Data Lab), harmonised to Census 2011. <em>b</em> is estimated by least squares on log population against log rank for districts with at least six towns; districts with fewer towns, including most single-city districts, are not included. Estimates with R² below 0.8 should be read with care. Analysis by Ankita Dey and Nikhil Mishra, CEL Lab. See the post <a href="../blog/one-big-town-or-many-small-ones.html">One big town, or many small ones?</a></p>
+  <p class="dnote">Map boundaries are Census-2011-based district boundaries with later changes; a district created after 2011 is coloured by the 2011 district it was carved from. Towns and populations from the SHRUG database (Development Data Lab), harmonised to Census 2011. <em>b</em> is estimated by least squares on log population against log rank for districts with at least six towns; districts with fewer towns, including most single-city districts, are not included. Estimates with R² below 0.8 should be read with care. Analysis by Ankita Dey and Nikhil Mishra, CEL Lab. See the post <a href="../blog/one-big-town-or-many-small-ones.html">One big town, or many small ones?</a></p>
 </div></section>
 <script>
 (function(){
@@ -77,6 +78,7 @@ function hex(c){return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),pars
 function col(b){if(b==null)return null;if(b<=RAMP[0][0])return RAMP[0][1];for(var i=1;i<RAMP.length;i++){if(b<=RAMP[i][0]){var a=hex(RAMP[i-1][1]),c=hex(RAMP[i][1]),t=(b-RAMP[i-1][0])/(RAMP[i][0]-RAMP[i-1][0]);return 'rgb('+Math.round(a[0]+(c[0]-a[0])*t)+','+Math.round(a[1]+(c[1]-a[1])*t)+','+Math.round(a[2]+(c[2]-a[2])*t)+')';}}return RAMP[RAMP.length-1][1];}
 function drawMap(){if(!M)return;var s='<svg viewBox="0 0 '+M.w+' '+M.h+'" role="img" aria-label="Map of India, districts coloured by Zipf exponent">';
   M.districts.forEach(function(dd,i){var c=col(dd.b);var isSel=sel&&dd.z===sel.d&&dd.zs===sel.s;s+='<path data-i="'+i+'" class="'+(c?'':'nd')+(isSel?' sel':'')+'" d="'+dd.d+'"'+(c?' fill="'+c+'"':'')+'><title>'+dd.n+', '+dd.st+(dd.b!=null?' · b = '+dd.b.toFixed(2)+(dd.z!==dd.n?' (2011 district: '+dd.z+')':''):' · no estimate')+'</title></path>';});
+  if(M.states)s+='<path class="stl" d="'+M.states+'"/>';
   s+='</svg>';var el=$('zxMap');el.innerHTML=s;
   el.querySelectorAll('path').forEach(function(p){p.addEventListener('click',function(){var dd=M.districts[+p.dataset.i];if(dd.z){var x=D.find(function(y){return y.d===dd.z&&y.s===dd.zs;});if(x)select(x);}});});
   $('zxLegend').innerHTML='<span>b</span><span class="ramp">'+RAMP.map(function(r){return '<i style="background:'+r[1]+'" title="'+r[0]+'"></i>';}).join('')+'</span><span>'+RAMP[0][0]+' → '+RAMP[RAMP.length-1][0]+'+</span><span><i style="display:inline-block;width:12px;height:12px;background:#e9e4da;vertical-align:middle"></i> no estimate</span>';}
