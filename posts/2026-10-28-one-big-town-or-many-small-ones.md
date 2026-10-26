@@ -39,7 +39,12 @@ At the other end is Kerala. **Malappuram** has a b of 0.40 across 44 towns; **Ka
 
 ## The map inside the map
 
-Put the districts together by state and the pattern is not random.
+Put the districts on a map and the pattern is not random.
+
+![Map of India with districts coloured by the Zipf exponent b](../assets/blog/zipf-district-map.jpg)
+*Districts coloured by b: teal where towns are of similar size, orange to brown where one town dominates, grey where there were fewer than six towns in 2011. Current district boundaries carry the value of the 2011 district they belonged to. Boundaries © OpenStreetMap contributors. Explore any district in the [interactive version](../data/district-hierarchy.html).*
+
+The south is teal and the north and west are orange. Grouped by state, the same thing in numbers:
 
 ![Zipf exponent b for districts, grouped by state](../assets/blog/zipf-by-state.svg)
 *One dot per district; the dark bar is the state median. States with at least five districts. Source: CEL Lab, from SHRUG / Census 2011.*

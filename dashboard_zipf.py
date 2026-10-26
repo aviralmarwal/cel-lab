@@ -2,7 +2,15 @@
 
 CSS = r"""
 /* district explorer */
-.zx-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.zx-top{display:grid;grid-template-columns:minmax(0,11fr) minmax(0,9fr);gap:22px;align-items:start}
+#zxMap svg{width:100%;height:auto;display:block}
+#zxMap path{stroke:#fff;stroke-width:.45;cursor:pointer;transition:opacity .15s}
+#zxMap path.nd{fill:#e9e4da;cursor:default}
+#zxMap path:hover{stroke:#16222e;stroke-width:1.2}
+#zxMap path.sel{stroke:#16222e;stroke-width:1.6}
+.zx-legend{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.zx-legend .ramp{display:flex}
+.zx-legend .ramp i{width:26px;height:12px;display:inline-block}
 @media(max-width:900px){.zx-top{grid-template-columns:1fr}}
 .zx-search{position:relative}
 .zx-search input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);font-family:var(--sans);font-size:15px;color:var(--ink)}
@@ -48,18 +56,30 @@ BODY = r"""
     <div class="ctrl"><label for="zxMinN">Minimum towns</label><select id="zxMinN"><option value="6">6 or more</option><option value="10">10 or more</option><option value="20">20 or more</option></select></div>
   </div>
   <div class="zx-top">
-    <div class="panel zx-detail" id="zxDetail"><p class="muted">Pick a district to see its hierarchy, how it compares, and its fitted rank–size line.</p></div>
-    <div class="panel"><h3 id="zxFTitle">Rank–size fingerprint</h3><div class="sub" id="zxFSub">Fitted line; largest town = 100; log scales</div><div id="zxFinger"></div></div>
+    <div class="panel"><h3>Map of b by district</h3><div class="sub">Teal: towns of similar size (b below 1). Orange to brown: one dominant town (b above 1). Grey: fewer than six towns in 2011, or no estimate. Click a district.</div><div id="zxMap"></div>
+      <div class="zx-legend" id="zxLegend"></div></div>
+    <div>
+      <div class="panel zx-detail" id="zxDetail"><p class="muted">Pick a district to see its hierarchy, how it compares, and its fitted rank–size line.</p></div>
+      <div class="panel" style="margin-top:22px"><h3 id="zxFTitle">Rank–size fingerprint</h3><div class="sub" id="zxFSub">Fitted line; largest town = 100; log scales</div><div id="zxFinger"></div></div>
+    </div>
   </div>
   <div class="panel" style="margin-top:22px"><h3 id="zxTTitle">All districts</h3><div class="sub">Click a column to sort; click a row to select.</div>
     <div class="zx-wrap"><table class="zx-table"><thead><tr><th data-k="d">District</th><th data-k="s">State</th><th data-k="b" class="on">b</th><th data-k="n">Towns</th><th data-k="pop">Urban pop. 2011</th><th data-k="r2">R²</th></tr></thead><tbody id="zxBody"></tbody></table></div>
     <div class="zx-more"><button type="button" class="btn" id="zxMore">Show more</button></div>
   </div>
-  <p class="dnote">Towns and populations from the SHRUG database (Development Data Lab), harmonised to Census 2011. <em>b</em> is estimated by least squares on log population against log rank for districts with at least six towns; districts with fewer towns, including most single-city districts, are not included. Estimates with R² below 0.8 should be read with care. Analysis by Ankita Dey and Nikhil Mishra, CEL Lab. See the post <a href="../blog/one-big-town-or-many-small-ones.html">One big town, or many small ones?</a></p>
+  <p class="dnote">Map boundaries are current districts (© OpenStreetMap contributors, via vardhan-maps, aligned to the Government of India depiction); each is coloured by the 2011 district it belonged to, so districts created since 2011 carry their parent's value. Towns and populations from the SHRUG database (Development Data Lab), harmonised to Census 2011. <em>b</em> is estimated by least squares on log population against log rank for districts with at least six towns; districts with fewer towns, including most single-city districts, are not included. Estimates with R² below 0.8 should be read with care. Analysis by Ankita Dey and Nikhil Mishra, CEL Lab. See the post <a href="../blog/one-big-town-or-many-small-ones.html">One big town, or many small ones?</a></p>
 </div></section>
 <script>
 (function(){
-var D=null,view=[],sortK='b',sortDir=-1,sel=null,shown=40;
+var D=null,M=null,view=[],sortK='b',sortDir=-1,sel=null,shown=40;
+var RAMP=[[0.4,'#0e7c7b'],[0.7,'#5fb3b0'],[0.9,'#b9ddd9'],[1.0,'#f1ede4'],[1.1,'#f3d7a6'],[1.4,'#e8a020'],[1.8,'#c4661c'],[2.3,'#8a3f12']];
+function hex(c){return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];}
+function col(b){if(b==null)return null;if(b<=RAMP[0][0])return RAMP[0][1];for(var i=1;i<RAMP.length;i++){if(b<=RAMP[i][0]){var a=hex(RAMP[i-1][1]),c=hex(RAMP[i][1]),t=(b-RAMP[i-1][0])/(RAMP[i][0]-RAMP[i-1][0]);return 'rgb('+Math.round(a[0]+(c[0]-a[0])*t)+','+Math.round(a[1]+(c[1]-a[1])*t)+','+Math.round(a[2]+(c[2]-a[2])*t)+')';}}return RAMP[RAMP.length-1][1];}
+function drawMap(){if(!M)return;var s='<svg viewBox="0 0 '+M.w+' '+M.h+'" role="img" aria-label="Map of India, districts coloured by Zipf exponent">';
+  M.districts.forEach(function(dd,i){var c=col(dd.b);var isSel=sel&&dd.z===sel.d&&dd.zs===sel.s;s+='<path data-i="'+i+'" class="'+(c?'':'nd')+(isSel?' sel':'')+'" d="'+dd.d+'"'+(c?' fill="'+c+'"':'')+'><title>'+dd.n+', '+dd.st+(dd.b!=null?' · b = '+dd.b.toFixed(2)+(dd.z!==dd.n?' (2011 district: '+dd.z+')':''):' · no estimate')+'</title></path>';});
+  s+='</svg>';var el=$('zxMap');el.innerHTML=s;
+  el.querySelectorAll('path').forEach(function(p){p.addEventListener('click',function(){var dd=M.districts[+p.dataset.i];if(dd.z){var x=D.find(function(y){return y.d===dd.z&&y.s===dd.zs;});if(x)select(x);}});});
+  $('zxLegend').innerHTML='<span>b</span><span class="ramp">'+RAMP.map(function(r){return '<i style="background:'+r[1]+'" title="'+r[0]+'"></i>';}).join('')+'</span><span>'+RAMP[0][0]+' → '+RAMP[RAMP.length-1][0]+'+</span><span><i style="display:inline-block;width:12px;height:12px;background:#e9e4da;vertical-align:middle"></i> no estimate</span>';}
 var $=function(id){return document.getElementById(id);};
 function fmtPop(v){return v.toLocaleString('en-IN');}
 function verdict(b){if(b>=1.6)return 'Strongly top-heavy: one town dominates and the rest fall away quickly.';if(b>=1.2)return 'Top-heavy: the largest town is well ahead of the others.';if(b>=0.9)return 'Close to Zipf\'s law: sizes fall roughly in proportion to rank.';if(b>=0.7)return 'Fairly even: towns of broadly similar size, no clear capital.';return 'Very even: many towns of similar size and no dominant centre.';}
@@ -96,7 +116,7 @@ function select(x){sel=x;var allB=D.map(function(y){return y.b;});var st=D.filte
    '<p class="muted" style="font-size:12.5px">Dot: this district. Teal ticks: other districts in '+x.s+'. Grey: all 415 districts.</p>'+
    '<div class="zx-facts"><div><b>'+x.n+'</b><span>towns in the fit</span></div><div><b>'+fmtPop(x.pop)+'</b><span>urban population, 2011</span></div><div><b>'+rankSt+' of '+st.length+'</b><span>most top-heavy in state</span></div><div><b>'+rankNat+' of '+D.length+'</b><span>most top-heavy in India</span></div><div><b>'+size2+'%</b><span>second town\'s size vs the largest, on the fitted line</span></div><div><b>'+x.r2.toFixed(2)+'</b><span>R² of the fit'+(x.r2<0.8?' (read with care)':'')+'</span></div></div>';
   $('zxFTitle').textContent='Rank–size fingerprint: '+x.d;$('zxFinger').innerHTML=finger(x);
-  $('zxQ').value=x.d;renderTable();if(window.innerWidth<900)$('zxDetail').scrollIntoView({behavior:'smooth',block:'start'});}
+  $('zxQ').value=x.d;renderTable();if(M){document.querySelectorAll('#zxMap path.sel').forEach(function(p){p.classList.remove('sel');});M.districts.forEach(function(dd,i){if(dd.z===x.d&&dd.zs===x.s){var p=document.querySelector('#zxMap path[data-i="'+i+'"]');if(p){p.classList.add('sel');p.parentNode.appendChild(p);}}});}if(window.innerWidth<900)$('zxDetail').scrollIntoView({behavior:'smooth',block:'start'});}
 function applyFilter(){var st=$('zxState').value,mn=+$('zxMinN').value;view=D.filter(function(x){return (!st||x.s===st)&&x.n>=mn;});
   view.sort(function(a,b){var va=a[sortK],vb=b[sortK];if(typeof va==='string')return va.localeCompare(vb)*sortDir;return (va-vb)*sortDir;});shown=40;renderTable();
   $('zxTTitle').textContent=(st||'All districts')+' · '+view.length+' districts';}
@@ -115,7 +135,7 @@ function init(){kpis();var st={};D.forEach(function(x){st[x.s]=1;});var sel_=$('
   q.addEventListener('keydown',function(ev){var items=sg.querySelectorAll('div');if(!items.length)return;if(ev.key==='ArrowDown'){cur=Math.min(cur+1,items.length-1);}else if(ev.key==='ArrowUp'){cur=Math.max(cur-1,0);}else if(ev.key==='Enter'){ev.preventDefault();(items[cur>=0?cur:0]).dispatchEvent(new MouseEvent('mousedown'));return;}else if(ev.key==='Escape'){sg.style.display='none';return;}else return;ev.preventDefault();items.forEach(function(it,i){it.classList.toggle('on',i===cur);});});
   q.addEventListener('blur',function(){setTimeout(function(){sg.style.display='none';},150);});
   applyFilter();var h=decodeURIComponent((location.hash||'').slice(1));var start=D.find(function(x){return x.d.toLowerCase()===h.toLowerCase();})||D.find(function(x){return x.d==='Malappuram';});if(start)select(start);}
-fetch('../assets/data/district-zipf.json').then(function(r){return r.json();}).then(function(j){D=j;init();}).catch(function(){$('zxDetail').innerHTML='<p class="muted">The data could not be loaded.</p>';});
+Promise.all([fetch('../assets/data/district-zipf.json').then(function(r){return r.json();}),fetch('../assets/data/india-districts.json').then(function(r){return r.json();}).catch(function(){return null;})]).then(function(a){D=a[0];M=a[1];drawMap();init();}).catch(function(){$('zxDetail').innerHTML='<p class="muted">The data could not be loaded.</p>';});
 })();
 </script>
 """

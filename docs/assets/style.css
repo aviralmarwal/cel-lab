@@ -269,7 +269,15 @@ a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 10px 2
 .ds-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 
 /* district explorer */
-.zx-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.zx-top{display:grid;grid-template-columns:minmax(0,11fr) minmax(0,9fr);gap:22px;align-items:start}
+#zxMap svg{width:100%;height:auto;display:block}
+#zxMap path{stroke:#fff;stroke-width:.45;cursor:pointer;transition:opacity .15s}
+#zxMap path.nd{fill:#e9e4da;cursor:default}
+#zxMap path:hover{stroke:#16222e;stroke-width:1.2}
+#zxMap path.sel{stroke:#16222e;stroke-width:1.6}
+.zx-legend{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.zx-legend .ramp{display:flex}
+.zx-legend .ramp i{width:26px;height:12px;display:inline-block}
 @media(max-width:900px){.zx-top{grid-template-columns:1fr}}
 .zx-search{position:relative}
 .zx-search input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:2px;background:var(--cream);font-family:var(--sans);font-size:15px;color:var(--ink)}
