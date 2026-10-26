@@ -637,6 +637,7 @@ def build_index():
     else:
         writing = '<p class="muted">No posts yet.</p>'
     # right column: activity lists
+    data_items = "".join(f'<li><a href="{d["href"]}">{e(d["title"])}</a><span>{e(d["kind"])}</span></li>' for d in DATA_ITEMS if d["kind"] != "Data story")
     wip = "".join(f'<li><a href="research/{o["theme"]}.html">{e(o["title"])}</a><span>{e(o.get("authors",""))}</span></li>' for o in ONGOING[:4])
     proj = "".join(f'<li><a href="projects.html">{e(p["title"])}</a><span>{e(p.get("role",""))}' + (f' · {e(p["funder"])}' if p.get("funder") else (f' · with {e(p["partner"])}' if p.get("partner") else "")) + '</span></li>' for p in [q for q in PROJECTS if q.get("status","ongoing")=="ongoing"][:3])
     news = "".join(f'<li><a href="{n["link"]}">{e(n["text"])}</a><span>{e(n["date_text"])}</span></li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
@@ -663,6 +664,7 @@ def build_index():
     {writing}
   </div>
   <aside class="col-side">
+    <div class="side-block"><h3>Data &amp; visuals</h3><ul class="mini">{data_items}</ul><a class="more" href="data.html">All data &amp; visuals →</a></div>
     <div class="side-block"><h3>Work in progress</h3><ul class="mini">{wip}</ul><a class="more" href="research.html#ongoing">All ongoing work →</a></div>
     <div class="side-block"><h3>Projects</h3><ul class="mini">{proj}</ul><a class="more" href="projects.html">Project details →</a></div>
     <div class="side-block"><h3>Recent publications</h3><ul class="mini">{recent}</ul><a class="more" href="publications.html">All publications →</a></div>
