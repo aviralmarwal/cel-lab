@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One big town, or many small ones? The shape of urban India, district by district · CEL Lab, IIT Roorkee</title>
+<meta name="description" content="In Gaya, one town dwarfs every other. In Malappuram, forty-four towns are nearly the same size. A single number from Zipf&#x27;s law, computed for 415 districts, shows that India has two quite different kinds of urbanisation, and they sort by region.">
+<meta property="og:title" content="One big town, or many small ones? The shape of urban India, district by district · CEL Lab">
+<meta property="og:description" content="In Gaya, one town dwarfs every other. In Malappuram, forty-four towns are nearly the same size. A single number from Zipf&#x27;s law, computed for 415 districts, shows that India has two quite different kinds of urbanisation, and they sort by region.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://cel-lab.in/assets/blog/cover-zipf.jpg">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="../index.html"><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span><span class="brand-text"><strong>CEL Lab</strong>IIT Roorkee</span></a>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
+  <ul class="links" id="navLinks"><li><a href="../index.html">Home</a></li><li><a href="../research.html">Research</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../people.html">People</a></li><li><a href="../publications.html">Publications</a></li><li><a href="../events.html">News</a></li><li><a href="../teaching.html">Teaching</a></li><li><a href="../blog.html" class="active">Blog</a></li><li><a href="../data.html">Data</a></li><li><a href="../opportunities.html">Join us</a></li><li><a href="../contact.html">Contact</a></li></ul>
+</div></header>
+<main>
+
+<section class="post-hero"><div class="wrap">
+  <div class="pmeta"><a href="../blog.html" style="color:inherit">Blog</a><span class="tagc">Urban growth</span><span class="tagc">Spatial data</span></div>
+  <h1>One big town, or many small ones? The shape of urban India, district by district</h1>
+  <p class="dek">In Gaya, one town dwarfs every other. In Malappuram, forty-four towns are nearly the same size. A single number from Zipf&#x27;s law, computed for 415 districts, shows that India has two quite different kinds of urbanisation, and they sort by region.</p>
+  <div class="byline"><div class="ini">AD</div><div><b>Ankita Dey and Nikhil Mishra</b><span>CEL Lab · 28 October 2026 · 6 min read</span></div></div>
+</div></section>
+<div class="post-cover"><img src="../assets/blog/cover-zipf.jpg" alt=""></div>
+<div class="post-wrap"><article class="post">
+<div class="keybox"><div class="kh">In brief</div><ul><li>We fitted Zipf&#x27;s law to the towns inside each of 415 Indian districts. The exponent b tells you whether a district is dominated by one town (high b) or made of many similar ones (low b).</li><li>The national median is 1.22, a little more top-heavy than Zipf&#x27;s law predicts. But the range runs from 0.39 in Imphal East to 2.76 in Gaya.</li><li>Kerala and Tamil Nadu have flat hierarchies almost everywhere; Bihar, Haryana and Gujarat are the most top-heavy. The north–south divide in how India urbanises is visible inside districts, not just between cities.</li><li>Districts with more towns are flatter. Where urbanisation has spread across many settlements, no single town has run away with it.</li></ul></div>
+<p>Ask someone to picture &ldquo;urban India&rdquo; and they will picture Mumbai, or Delhi, or perhaps the IT corridors of Bengaluru. Most of urban India looks nothing like that. The 2011 Census counted close to eight thousand towns, and the large majority of them have fewer than a hundred thousand people. How those towns are arranged, whether a district has one town that matters and a scatter of villages with municipal status, or a dense web of medium-sized towns with no obvious capital, says a great deal about how its economy works and what kind of planning it needs.</p>
+<p>We wanted a single number that captures this, for every district in the country. The tool is an old one.</p>
+<h2>Zipf&rsquo;s law, in one paragraph</h2>
+<p>Rank the towns in a region by population, largest first. For a surprising number of regions, the second town is about half the size of the first, the third about a third, the tenth about a tenth. Plot size against rank on logarithmic axes and you get a straight line with a slope of minus one. That regularity is Zipf&rsquo;s law, and the slope, called b, is the number we are interested in.</p>
+<p>When b is 1, the region follows Zipf&rsquo;s law. When b is well above 1, the line is steeper: the top town is far bigger than the rest, and sizes fall away quickly down the ranking. When b is well below 1, the line is flat: the towns are of similar size and no single one dominates. The number is a compact description of hierarchy.</p>
+<p>We computed it for every district with at least six towns in the Census of 2011, using the SHRUG database, which gives 415 districts across 29 states and union territories. The fit is good in most places: the median R² is 0.93.</p>
+<h2>Two kinds of district</h2>
+<p>The national median b is 1.22, a touch more top-heavy than a textbook Zipf distribution, and about a fifth of districts sit between 0.9 and 1.1, close to the law. The interesting part is the tails.</p>
+<p><img alt="Fitted rank-size lines for six districts" src="../assets/blog/zipf-fingerprints.svg" />
+<em>Fitted rank–size lines for the towns in six districts, with the largest town set to 100. The steeper the line, the more the largest town dominates. Source: CEL Lab, from SHRUG / Census 2011.</em></p>
+<p>At one end is <strong>Gaya</strong>, in Bihar, with the highest b in the country at 2.76. Gaya has six census towns; the city of Gaya is the only one of consequence and the rest are small. <strong>Kanpur Nagar</strong> (2.26) and <strong>Bangalore</strong> district (2.17) are the same shape at a larger scale: one metropolis, surrounded by towns that are tiny by comparison. Fifteen districts have a b above 2. Six of them are in Bihar and Uttar Pradesh, and the list also includes metropolitan districts such as Ahmedabad and Ghaziabad, where one city has outgrown everything around it.</p>
+<p>At the other end is Kerala. <strong>Malappuram</strong> has a b of 0.40 across 44 towns; <strong>Kannur</strong> 0.54 across 67. Kollam, Kottayam, Thrissur and Kozhikode all sit below 0.7, and only Thiruvananthapuram, with the state capital, reaches Zipf&rsquo;s law. These districts are densely urban, but there is no city at the top; there is a continuous carpet of towns of similar size, which is what the long-observed &ldquo;rural–urban continuum&rdquo; of Kerala looks like when you measure it. Tamil Nadu is the same story a little less strongly: <strong>Kanniyakumari</strong> has 91 towns and a b of 0.52, and even Coimbatore, with one of the state&rsquo;s largest cities, comes out at 0.94, close to Zipf, because it has 68 towns behind the city rather than a handful.</p>
+<blockquote>
+<p>Kerala&rsquo;s districts are densely urban, but there is no city at the top. There is a carpet of towns of similar size.</p>
+</blockquote>
+<h2>The map inside the map</h2>
+<p>Put the districts together by state and the pattern is not random.</p>
+<p><img alt="Zipf exponent b for districts, grouped by state" src="../assets/blog/zipf-by-state.svg" />
+<em>One dot per district; the dark bar is the state median. States with at least five districts. Source: CEL Lab, from SHRUG / Census 2011.</em></p>
+<p>The states with the most top-heavy districts are <strong>Bihar</strong> (median b of 1.59), <strong>Haryana</strong> (1.53) and <strong>Gujarat</strong> (1.52), followed by Andhra Pradesh, Odisha and Punjab around 1.4. The flattest are <strong>Kerala</strong> (0.66) and <strong>Tamil Nadu</strong> (0.94), with nothing else close. Uttar Pradesh, Madhya Pradesh, West Bengal and the north-east sit in the middle, near 1.1 to 1.2, but with wide spreads: Uttar Pradesh&rsquo;s 66 districts run all the way from Kaushambi at 0.47 to Kanpur Nagar at 2.26.</p>
+<p>Economists have long described a north–south difference in Indian urbanisation: the south urbanised earlier, more evenly and through many smaller towns, the north later and more through a few large cities. What this exercise shows is that the difference is not only between big cities. It is present at the scale of the district, in how the dozen or so towns of an ordinary district are arranged relative to one another.</p>
+<p>There is a mechanical part of the explanation, and it is worth being honest about it. Districts with more towns have flatter hierarchies: the correlation between b and the number of towns is about −0.3. Kerala&rsquo;s districts have many towns partly because the Census classifies so much of Kerala as urban. But the number of towns is itself an outcome of how settlement has spread, so this is less a statistical artefact than a restatement of the finding. Where urbanisation has diffused across many places, no single place has run away with it.</p>
+<h2>Why the number is useful</h2>
+<p>A district with a b of 2 and a district with a b of 0.5 need different things.</p>
+<p>In the top-heavy district, the main town carries the services, the jobs and the migrants for the whole district. Planning questions are about that town: its housing, its transport, its capacity to absorb growth. The smaller towns are satellites and their prospects depend on the connection to the centre.</p>
+<p>In the flat district there is no centre to plan around. Services have to be distributed across many towns of similar weight; connectivity between them matters more than connectivity to any one of them; and growth, when it comes, arrives in several places at once. Policies designed for the first kind of district, such as the Smart Cities Mission&rsquo;s focus on single municipalities, fit the second kind badly.</p>
+<p>This is why we built the measure. The lab&rsquo;s work on how cities grow, on where people can reach services, and on how a district&rsquo;s economic character shapes its population distribution all needs a way of saying what kind of urban system a place has before asking how it is changing. One number does not describe a district, but this one tells you which of two very different stories you are in.</p>
+<p class="note"><em>A note on the data.</em> Towns and populations are from the SHRUG database (Development Data Lab), harmonised to Census 2011. Zipf's exponent b is estimated by ordinary least squares on log population against log rank for each district with at least six towns; districts with fewer towns are excluded, which removes most single-city districts such as Mumbai and Chennai. Twenty-seven districts have an R² below 0.8 and their estimates should be read with care; Bangalore's is 0.75. District-level estimates are available from the lab on request.</p>
+<div class="share"><span>Share</span>
+  <a href="https://twitter.com/intent/tweet?text=One big town, or many small ones? The shape of urban India, district by district&url=https://cel-lab.in/blog/one-big-town-or-many-small-ones.html" target="_blank" rel="noopener">X / Twitter</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://cel-lab.in/blog/one-big-town-or-many-small-ones.html" target="_blank" rel="noopener">LinkedIn</a>
+  <a href="https://wa.me/?text=One big town, or many small ones? The shape of urban India, district by district%20https://cel-lab.in/blog/one-big-town-or-many-small-ones.html" target="_blank" rel="noopener">WhatsApp</a>
+  <button type="button" id="copyLink" data-url="https://cel-lab.in/blog/one-big-town-or-many-small-ones.html">Copy link</button></div>
+
+<div class="more-posts"><h3>More from the blog</h3><div class="grid posts"><article class="pcard2"><a class="cov" href="../blog/before-the-master-plan.html"><img src="../assets/blog/cover-ancient-cities.jpg" alt="" loading="lazy"></a><div class="pb"><div class="pmeta"><span class="tagc">Urban history</span> <span class="tagc">Planning</span><span>27 October 2026</span><span>13 min read</span></div><h3><a href="../blog/before-the-master-plan.html">Before the master plan: what Pataliputra, Puhar and Dhar knew about making cities</a></h3><p>Three Indian texts, written between the fourth century BCE and the eleventh century CE, describe cities with zoned land use, graded road widths, covered drains, rain gauges and rules for taking in migrants. A reading of the Arthashastra, the Chola sources and the Samarangana Sutradhara.</p></div></article><article class="pcard2"><a class="cov" href="../blog/who-really-pays.html"><img src="../assets/blog/cover-who-pays.jpg" alt="" loading="lazy"></a><div class="pb"><div class="pmeta"><span class="tagc">Vacant land tax</span> <span class="tagc">Urban sprawl</span><span>26 October 2026</span><span>6 min read</span></div><h3><a href="../blog/who-really-pays.html">Who really pays? When the edge of the city is taxed harder than the centre</a></h3><p>In Gaya, the effective tax on cheap peripheral land is four times the rate on the city&#x27;s best addresses. In Coimbatore and Ranchi, centre and edge pay the same. The design of a vacant land tax decides whether it pushes cities inward or lets them spread.</p></div></article><article class="pcard2"><a class="cov" href="../blog/the-frozen-tax.html"><img src="../assets/blog/cover-frozen-tax.jpg" alt="" loading="lazy"></a><div class="pb"><div class="pmeta"><span class="tagc">Vacant land tax</span> <span class="tagc">Municipal finance</span><span>25 October 2026</span><span>6 min read</span></div><h3><a href="../blog/the-frozen-tax.html">The frozen tax</a></h3><p>Delhi has not revised its vacant-land tax rates since 2004. Patna&#x27;s go back to 1993. Across our 38-city database, the commonest thing a city does with this tax is nothing, for years, and then everything at once.</p></div></article></div></div>
+<div class="post-nav"><a href="../blog.html">← All posts</a></div>
+</article></div>
+<script>
+(function(){var c=document.getElementById('copyLink');if(!c)return;c.addEventListener('click',function(){var u=location.href.split('#')[0];
+(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){c.textContent='Copied';setTimeout(function(){c.textContent='Copy link';},1800);},function(){window.prompt('Copy this link',u);});});})();
+</script>
+
+</main>
+<footer><div class="wrap">
+  <div><span class="mono"><span class="c">C</span><span class="e">E</span><span class="l">L</span></span></div>
+  <div>City Experimentation and Learning Lab · IIT Roorkee</div>
+  <div>© 2026 CEL Lab</div>
+</div></footer>
+<script>
+(function(){var b=document.getElementById('menuBtn'),l=document.getElementById('navLinks');
+b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'Close':'Menu';});})();
+</script>
+</body>
+</html>
