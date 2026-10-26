@@ -85,6 +85,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-heigh
 @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
 .home-cols{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;align-items:start}
 @media(max-width:900px){.home-cols{grid-template-columns:1fr;gap:40px}}
+.grid.data-cards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
 .lead-post{display:block;background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;color:inherit}
 .lead-post:hover{text-decoration:none}
 .lead-post img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
@@ -637,7 +638,8 @@ def build_index():
     else:
         writing = '<p class="muted">No posts yet.</p>'
     # right column: activity lists
-    data_items = "".join(f'<li><a href="{d["href"]}">{e(d["title"])}</a><span>{e(d["kind"])}</span></li>' for d in DATA_ITEMS if d["kind"] != "Data story")
+    data_items = "".join(f'<a class="card" href="{d["href"]}"><div class="thumb" style="aspect-ratio:16/9;background:var(--paper)"><img src="{d["thumb"]}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"></div>'
+                         f'<div class="card-body"><div class="eyebrow amber">{e(d["kind"])}</div><h3 style="font-size:19px">{e(d["title"])}</h3><p>{e(d["desc"])}</p><span class="cta">Open →</span></div></a>' for d in DATA_ITEMS if d["kind"] != "Data story")
     wip = "".join(f'<li><a href="research/{o["theme"]}.html">{e(o["title"])}</a><span>{e(o.get("authors",""))}</span></li>' for o in ONGOING[:4])
     proj = "".join(f'<li><a href="projects.html">{e(p["title"])}</a><span>{e(p.get("role",""))}' + (f' · {e(p["funder"])}' if p.get("funder") else (f' · with {e(p["partner"])}' if p.get("partner") else "")) + '</span></li>' for p in [q for q in PROJECTS if q.get("status","ongoing")=="ongoing"][:3])
     news = "".join(f'<li><a href="{n["link"]}">{e(n["text"])}</a><span>{e(n["date_text"])}</span></li>' for n in sorted(NEWS, key=lambda n: n["date"], reverse=True)[:3])
@@ -662,9 +664,10 @@ def build_index():
   <div class="col-main">
     <div class="sec-head"><div><div class="eyebrow">Latest writing</div><h2>From the blog</h2></div><a class="more" href="blog.html">All posts →</a></div>
     {writing}
+    <div class="sec-head" style="margin-top:44px"><div><div class="eyebrow">Data &amp; visuals</div><h2>Explore the data</h2></div><a class="more" href="data.html">All data &amp; visuals →</a></div>
+    <div class="grid data-cards">{data_items}</div>
   </div>
   <aside class="col-side">
-    <div class="side-block"><h3>Data &amp; visuals</h3><ul class="mini">{data_items}</ul><a class="more" href="data.html">All data &amp; visuals →</a></div>
     <div class="side-block"><h3>Work in progress</h3><ul class="mini">{wip}</ul><a class="more" href="research.html#ongoing">All ongoing work →</a></div>
     <div class="side-block"><h3>Projects</h3><ul class="mini">{proj}</ul><a class="more" href="projects.html">Project details →</a></div>
     <div class="side-block"><h3>Recent publications</h3><ul class="mini">{recent}</ul><a class="more" href="publications.html">All publications →</a></div>
@@ -1031,7 +1034,7 @@ DATA_ITEMS = [
      "thumb": "assets/blog/cover-plot-empty.jpg",
      "desc": "38 cities, 16 states, 2011–2025. Map, ranking and city-by-city formulas for what it costs to hold a residential plot empty."},
     {"kind": "Interactive explorer", "title": "District urban hierarchy explorer", "href": "data/district-hierarchy.html",
-     "thumb": "assets/blog/cover-zipf.jpg",
+     "thumb": "assets/blog/zipf-district-map.jpg",
      "desc": "Zipf's exponent for the towns in 415 districts: search any district, see how top-heavy its urban system is, and compare it with its state and the country."},
     {"kind": "Data story", "title": "One big town, or many small ones?", "href": "blog/one-big-town-or-many-small-ones.html",
      "thumb": "assets/blog/zipf-by-state.svg", "desc": "District-level urban hierarchy by state: Kerala and Tamil Nadu flat, Bihar, Haryana and Gujarat top-heavy."},

@@ -72,6 +72,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;color:var(--ink);line-heigh
 @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
 .home-cols{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;align-items:start}
 @media(max-width:900px){.home-cols{grid-template-columns:1fr;gap:40px}}
+.grid.data-cards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
 .lead-post{display:block;background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;color:inherit}
 .lead-post:hover{text-decoration:none}
 .lead-post img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
